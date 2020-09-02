@@ -7,6 +7,7 @@ module.exports = app => {
   const { router, controller, middleware } = app;
   const isLogin = middleware.verifyToken()
   const roleAndUseStatus = middleware.roleAndUseStatus()
+  const editAdmin = middleware.editAdmin()
 
 
   router.get('/', controller.home.index);
@@ -19,5 +20,8 @@ module.exports = app => {
   router.get("/user/getUserInfo", isLogin, controller.admin.login.getUserInfo)
   // 获取用户信息
   router.post("/user/getUserInfoId", isLogin, roleAndUseStatus, controller.admin.login.getUserInfoId)
-
+  // 获取用户列表
+  router.post("/user/userList", isLogin, roleAndUseStatus, controller.admin.user.userList)
+  // 修改用户信息
+  router.post("/user/editUserInfo", isLogin, roleAndUseStatus, editAdmin, controller.admin.user.editUserInfo)
 };
