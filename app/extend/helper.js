@@ -30,7 +30,7 @@ module.exports = {
   // 获取 Token
   getAccessToken () {
     const bearerToken = this.ctx.request.header.authorization
-    return bearerToken && bearerToken.replace("Bearer", "")
+    return bearerToken && bearerToken.replace("Bearer ", "")
   },
 
   // 校验 Token

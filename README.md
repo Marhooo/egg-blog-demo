@@ -1,8 +1,10 @@
 # eggserver
-Alt+M快捷键Markdown
-###0901 login和register完成
+*Alt+M快捷键Markdown*
+#### 0901 login和register完成
 >- findById方法注意sequelize的版本
 >- ```replace(/-/g, "")```用于格式化日期，如2016-1-1格式化为201611,```/g ```代表全局，所有的```- ```都替换
+#### 0902 获取当前用户信息&&获取用户信息完成
+>- 修改了getAccessToken ()中```return bearerToken && bearerToken.replace("Bearer ", "")```这段代码,在Bearer后面加了一个*空格*,方便Postman加入Bearer Token,这样在前端vue代码中也需要修改了.
 
 ## QuickStart
 

@@ -2,6 +2,7 @@ const Controller = require("../../core/base_controller");
 const { cryptoMd5 } = require("../../extend/helper");
 
 class LoginController extends Controller {
+  //用户登陆
   async userLogin() {
     const { username, password } = this.ctx.request.body;
     const keys = this.config.keys;
@@ -63,6 +64,48 @@ class LoginController extends Controller {
     }
     this.ctx.body = results;
   }
+
+
+  // 登录查询个人信息
+  async getUserInfo () {
+    const token = await this.ctx.helper.getAccessToken()
+    const result = {}
+    await this.ctx.app.jwt.verify(token, this.ctx.app.config.jwt.secret, function (err, decoded) {
+      if (err) {
+        result.verify = false
+        result.message = err.message
+      } else {
+        result.verify = true
+        result.message = decoded
+      }
+    })
+
+    const userInfo = await this.ctx.service.admin.login.getUserInfo(result)
+    this.ctx.session.user = userInfo
+
+    if (userInfo) {
+      this.ctx.body = {
+        name: userInfo.name,
+        role: userInfo.getDataValue("roleName"),
+        authorityRouter: userInfo.getDataValue("authorityRouter"),
+        permissionButton: userInfo.getDataValue("permissionButton"),
+        avatar: userInfo.avatar,
+        id: userInfo.id,
+      }
+    } else {
+      await this.ctx.helper.error(401, 10000, "该账号不存在")
+    }
+  }
+
+
+  // 获取用户信息
+  async getUserInfoId () {
+    const { id } = this.ctx.request.body
+    this.ctx.body = await this.ctx.service.admin.login.getUserInfoId(id)
+  }
+
+
+  
 }
 
 module.exports = LoginController
