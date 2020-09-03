@@ -43,7 +43,7 @@ class UserController extends Controller {
     const oldPass = await cryptoMd5(oldPassword, keys)
 
     if(oldPass !== myPassword){
-      result = {
+      results = {
         code: 10000,
         message: "原密码错误"
       }
@@ -52,6 +52,13 @@ class UserController extends Controller {
       results = await this.ctx.service.admin.user.editPassword(myId, newPass)
     }
     this.ctx.body = results
+  }
+
+
+  // 删除用户
+  async delUser () {
+    const id = this.ctx.request.body.id
+    this.ctx.body = await this.ctx.service.admin.user.delUser(id)
   }
 
 

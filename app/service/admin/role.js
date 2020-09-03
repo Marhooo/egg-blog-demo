@@ -104,6 +104,53 @@ class RoleService extends Service {
   }
 
 
+  // 删除角色
+  async delRole (rid) {
+    let results = {}
+    const { ctx } = this
+    await ctx.model.SystemRole.findById(rid).then(async res => {
+      if (res.name === "超级管理员") {
+        results = {
+          code: 10000,
+          message: "系统最高权限不可以删除",
+        }
+      } else {
+        await ctx.model.SystemRole.destroy({
+          where: {
+            id: rid,
+          },
+        }).then(async res => {
+          if (res > 0) {
+            await ctx.model.SystemRolePermission.destroy({
+              where: {
+                role_id: rid,
+              }
+            }).then(() => {
+              if (res > 0) {
+                results = {
+                  code: 200,
+                  message: "删除成功",
+                }
+              }
+            })
+          } else {
+            results = {
+              code: 10000,
+              message: "删除失败",
+            }
+          }
+        }).catch(error => {
+          console.log(error)
+          results = {
+            code: 10000,
+            message: error,
+          }
+        })
+      }
+    })
+    return results
+  }
+
 
 }
 

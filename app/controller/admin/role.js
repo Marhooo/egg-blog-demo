@@ -11,7 +11,12 @@ class RoleController extends Controller{
     const roleData = this.ctx.request.body
     this.ctx.body = await this.service.admin.role.addRole(roleData)
   }
-  
+
+  // 删除角色
+  async delRole () {
+    const id = this.ctx.request.body.id
+    this.ctx.body = await this.ctx.service.admin.role.delRole(id)
+  }
   
 
 }

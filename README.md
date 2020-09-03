@@ -15,6 +15,13 @@
 >- 与原著中注释有出入,角色的增加和修改都写在了一个api中,前提条件是不能修改超级管理员角色
 >- ```const { id = null, name, describe, status } = options```中```id=null```表示id默认为空,不是赋值的意思   整句代码解构语句
 >- 在/controller/admin/user.js中原著```const myPassword = this.ctx.session.admin.user.password```这段代码有bug,admin应该去掉,应该是```const myPassword = this.ctx.session.user.password```
+#### 0903 删除用户&&获取角色列表&&删除角色
+>- 无论在删除用户delUser()中还是在中间件editAdmin中,用户的role_id用于映射SystemRole权限表中的外键至关重要,如果用户的role_id不存在就会导致程序错误推出
+>- 在原著中获取角色列表的路由是post,改成get
+>- 整篇代码async和promis混着写,一塌糊涂
+>- ```await ctx.model.SystemRole.findById(rid).then(async res => {}```代码中sequelize返回一个 promise，这个 promise resolve 后返回一个数字,所以如果找到了结果,res的值就是找到的结果的数值.
+
+
 
 
 

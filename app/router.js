@@ -26,9 +26,12 @@ module.exports = app => {
   router.post("/user/editUserInfo", isLogin, roleAndUseStatus, editAdmin, controller.admin.user.editUserInfo)
   // 修改密码
   router.post("/user/editPassword", isLogin, roleAndUseStatus, controller.admin.user.editPassword)
-
-
-
+  // 删除用户
+  router.post("/user/delUser", isLogin, roleAndUseStatus, editAdmin, controller.admin.user.delUser)
+  // 角色列表
+  router.get("/permissions/getRoleList", isLogin, roleAndUseStatus, controller.admin.role.getRoleList)
   // 增加角色
   router.post("/permissions/addRole", isLogin, roleAndUseStatus, controller.admin.role.addRole)
+  // 删除角色
+  router.post("/permissions/delRole", isLogin, roleAndUseStatus, controller.admin.role.delRole)
 };

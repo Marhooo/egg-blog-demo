@@ -76,6 +76,47 @@ class UserService extends Service{
   }
 
 
+  // 删除用户
+  async delUser (uid) {
+    let results = ""
+    const { ctx } = this
+    await ctx.model.SystemUser.findById(uid).then(async sueRes => {
+      await ctx.model.SystemRole.findById(sueRes.role_id).then(async roleRes => {
+        if (roleRes.name === "超级管理员") {
+          results = {
+            code: 10000,
+            message: "系统最高管理员不可以删除",
+          }
+        } else {
+          await ctx.model.SystemUser.destroy({
+            where: {
+              id: uid,
+            },
+          }).then(res => {
+              console.log(res)
+              if (res > 0) {
+                results = {
+                  code: 200,
+                  message: "删除成功",
+                }
+              } else {
+                results = {
+                  code: 10000,
+                  message: "删除失败",
+                }
+              }
+          }).catch(error => {
+            console.log(error)
+            results = {
+              code: 10000,
+              message: error,
+            }
+          })
+        }
+      })
+    })
+    return results
+  }
 
 
 }
