@@ -33,6 +33,27 @@ class UserController extends Controller {
   }
 
 
+  //修改密码
+  async editPassword(){
+    const {oldPassword, newPassword} = this.ctx.request.body
+    const keys = this.config.keys
+    let results = ""
+    const myPassword = this.ctx.session.user.password
+    const myId = this.ctx.session.user.id
+    const oldPass = await cryptoMd5(oldPassword, keys)
+
+    if(oldPass !== myPassword){
+      result = {
+        code: 10000,
+        message: "原密码错误"
+      }
+    }else{
+      const newPass = await cryptoMd5(newPassword, keys)
+      results = await this.ctx.service.admin.user.editPassword(myId, newPass)
+    }
+    this.ctx.body = results
+  }
+
 
 
 }

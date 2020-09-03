@@ -24,4 +24,11 @@ module.exports = app => {
   router.post("/user/userList", isLogin, roleAndUseStatus, controller.admin.user.userList)
   // 修改用户信息
   router.post("/user/editUserInfo", isLogin, roleAndUseStatus, editAdmin, controller.admin.user.editUserInfo)
+  // 修改密码
+  router.post("/user/editPassword", isLogin, roleAndUseStatus, controller.admin.user.editPassword)
+
+
+
+  // 增加角色
+  router.post("/permissions/addRole", isLogin, roleAndUseStatus, controller.admin.role.addRole)
 };

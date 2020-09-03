@@ -10,7 +10,17 @@
 >- 在controller/admin/login.js中,完成用户登陆后需要直接去调用getUserInfo (),```this.ctx.session.user = userInfo```会把userInfo直接写入session中,且在前一行代码```const userInfo = await this.ctx.service.admin.login.getUserInfo(result)```中会去生成另外几个键例如```"roleName"```,为了后面的代码做工作
 >- 三目运算,```tagRoleName = response ? response.name : ""```中表示response是否存在?存在的话```tagRoleName=response.name```,不存在的话```tagRoleName = ""```
 >- [findAndCountAll](https://sequelize.org/master/class/lib/model.js~Model.html#static-method-findAndCountAll)的使用查看文档
->- 另有一处代码```options.status = options.status ? "1" : "0"```需要解决,此处原著逻辑好像有点问题,如果修改内容status不写,会默认修改数据库status为0,而进一步导致账号状态被禁用
+#### 0903 修改密码&&增加角色完成
+>- 在修改密码editPassword()中,修改密码成功需要重新登录,后台是没有写逻辑的.所以在前端页面中需强制登出且重新登录,重写逻辑
+>- 与原著中注释有出入,角色的增加和修改都写在了一个api中,前提条件是不能修改超级管理员角色
+>- ```const { id = null, name, describe, status } = options```中```id=null```表示id默认为空,不是赋值的意思   整句代码解构语句
+>- 在/controller/admin/user.js中原著```const myPassword = this.ctx.session.admin.user.password```这段代码有bug,admin应该去掉,应该是```const myPassword = this.ctx.session.user.password```
+
+
+
+
+
+
 
 ## QuickStart
 
