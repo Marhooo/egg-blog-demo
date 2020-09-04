@@ -17,8 +17,18 @@ class RoleController extends Controller{
     const id = this.ctx.request.body.id
     this.ctx.body = await this.ctx.service.admin.role.delRole(id)
   }
-  
 
+  // 分配角色权限
+  async rolePermissions () {
+    const permissionsData = this.ctx.request.body
+    this.ctx.body = await this.ctx.service.admin.role.rolePermissions(permissionsData)
+  }
+  
+  // 获取角色所拥有的权限
+  async searchRolePermissions () {
+    const { rid } = this.ctx.request.body
+    this.ctx.body = await this.ctx.service.admin.role.searchRolePermissions(rid)
+  }
 }
 
 module.exports = RoleController

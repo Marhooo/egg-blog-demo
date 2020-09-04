@@ -34,4 +34,12 @@ module.exports = app => {
   router.post("/permissions/addRole", isLogin, roleAndUseStatus, controller.admin.role.addRole)
   // 删除角色
   router.post("/permissions/delRole", isLogin, roleAndUseStatus, controller.admin.role.delRole)
+  // 分配角色权限
+  router.post("/permissions/rolePermissions", isLogin, roleAndUseStatus, controller.admin.role.rolePermissions)
+  // 获取角色所拥有的权限
+  router.post("/permissions/searchRolePermissions", isLogin, roleAndUseStatus, controller.admin.role.searchRolePermissions)
+
+  /**************************************************************** */
+  // 发表文章
+  router.post("/article/addArticle", isLogin, controller.article.addArticle)  
 };

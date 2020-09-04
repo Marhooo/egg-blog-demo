@@ -152,6 +152,71 @@ class RoleService extends Service {
   }
 
 
+  // 分配角色权限
+  async rolePermissions (options) {
+    const { ctx } = this
+    const { rid, selectPermission } = options
+    const permissionPage = []
+    const permissionButton = []
+    for (let i = 0; i < selectPermission.length; i++) {
+      if (selectPermission[i].toString().includes("btn")) {
+        permissionButton.push(selectPermission[i])
+      } else {
+        permissionPage.push(selectPermission[i])
+      }
+    }
+    let results = ""
+    await ctx.model.SystemRolePermission.update({
+      permission_page: permissionPage.join(","),
+      permission_button: permissionButton.join(","),
+    }, {
+      where: {
+        role_id: rid,
+      },
+    })
+      .then(async res => {
+        console.log(res)
+        results = {
+          code: 200,
+          message: "该角色权限分配成功",
+        }
+      })
+      .catch(err => {
+        results = {
+          code: 10000,
+          message: err,
+        }
+      })
+    return results
+  }
+
+
+  // 获取角色所拥有的权限
+  async searchRolePermissions (rid) {
+    const { ctx } = this
+    let results = {}
+    await ctx.model.SystemRolePermission.findOne({
+      where: {
+        role_id: rid,
+      }
+    })
+      .then(async res => {
+        console.log(res)
+        results = {
+          code: 200,
+          message: "",
+          data: {
+            permissionPage: res.permission_page,
+            permissionButton: res.permission_button,
+          },
+        }
+      })
+      .catch(err => {
+        console.log(err)
+      })
+    return results
+  }
+
 }
 
 module.exports = RoleService;

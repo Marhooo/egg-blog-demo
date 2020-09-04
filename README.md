@@ -18,8 +18,10 @@
 #### 0903 删除用户&&获取角色列表&&删除角色
 >- 无论在删除用户delUser()中还是在中间件editAdmin中,用户的role_id用于映射SystemRole权限表中的外键至关重要,如果用户的role_id不存在就会导致程序错误推出
 >- 在原著中获取角色列表的路由是post,改成get
->- 整篇代码async和promis混着写,一塌糊涂
+>- 整篇代码async和promise混着写,一塌糊涂
 >- ```await ctx.model.SystemRole.findById(rid).then(async res => {}```代码中sequelize返回一个 promise，这个 promise resolve 后返回一个数字,所以如果找到了结果,res的值就是找到的结果的数值.
+#### 0904 分配角色权限&&获取角色所拥有的权限&&增加修改文章
+>- /controller/article.js中addArticle ()里if判断修改成```if (articleResult == true) {}```
 
 
 
