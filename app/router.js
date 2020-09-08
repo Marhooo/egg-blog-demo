@@ -41,5 +41,7 @@ module.exports = app => {
 
   /**************************************************************** */
   // 发表文章
-  router.post("/article/addArticle", isLogin, controller.article.addArticle)  
+  router.post("/article/addArticle", isLogin, controller.article.addArticle)
+  // 文章列表
+  router.post("/article/articleList", isLogin, controller.article.articleList)
 };
