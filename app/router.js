@@ -44,4 +44,8 @@ module.exports = app => {
   router.post("/article/addArticle", isLogin, controller.article.addArticle)
   // 文章列表
   router.post("/article/articleList", isLogin, controller.article.articleList)
+  // 文章修改回显
+  router.post("/article/getArticle", isLogin, controller.article.getArticle)
+  // 删除文章
+  router.post("/article/delArticle", isLogin, controller.article.delArticle)  
 };

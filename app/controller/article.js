@@ -30,6 +30,24 @@ class ArticleController extends Controller {
 
     this.ctx.body = list
   }
+
+  //文章回显
+  async getArticle(){
+    const id = this.ctx.request.body.id
+    const result = await this.ctx.service.article.getArticle(id)
+
+    this.ctx.body = result
+  }
+
+  // 删除文章
+  async delArticle () {
+    const id = this.ctx.request.body.id
+    const result = await this.ctx.service.article.delArticle(id)
+    //const result = await this.ctx.service.article.delArticle(this.ctx.request.body.id)
+    this.ctx.body = result
+  }
+
+
 }
 
 module.exports = ArticleController

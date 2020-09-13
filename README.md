@@ -24,6 +24,9 @@
 >- /controller/article.js中addArticle ()里if判断修改成```if (articleResult == true) {}```
 #### 0908 查询文章列表
 >- 暂无
+#### 0913 文章修改回&&删除文章
+>- 这两块的代码自己完成了修正，由于原著中的代码async和promise混着乱写。我全部改成了async和await的写法，并且完成了egg-validate的添加，保证了简单的校验和错误异常的抛出。把校验层写在了service中，因为错误的抓取是写在了service层中。
+>- service层中```this.ctx.validate({id: 'string'})```此处的id是指ctx.request.body中是否有id且是否为string，并不是调用controller层中const的那个id。
 
 
 

@@ -40,6 +40,48 @@ class articleService extends Service {
     return result
   }
 
+  //文章回显
+  async getArticle(aId){
+    try{
+      return await this.ctx.model.Article.findById(aId)
+    }catch(err){
+      console.log(err)
+    }
+  }
+
+  //删除文章
+  async delArticle(aId){
+    let results
+    try{
+      this.ctx.validate({
+        id: 'string'
+      })
+      const res = await this.ctx.model.Article.destroy({
+        where:{
+          id: aId
+        }
+      })
+      if(res>0){
+        results = {
+          code: 200,
+          message: "删除成功"
+        }
+      }else{
+        results = {
+          code: 10000,
+          message: "删除失败"
+        }
+      }
+      return results
+    }catch(err){
+      results = {
+        code: 10000,
+        message: err.message
+      }
+      return results
+    }
+  }
+
   
 }
 
