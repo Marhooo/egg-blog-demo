@@ -2,6 +2,8 @@ const crypto = require("crypto");
 const path = require("path");
 const fs = require("fs");
 const dayjs = require("dayjs");
+const sendToWormhole = require("stream-wormhole")
+const awaitStreamReady = require("await-stream-ready").write
 
 module.exports = {
   // MD5 对密码和秘钥进行混合双重加密
@@ -87,4 +89,37 @@ module.exports = {
     }
     return backResult
   },
+
+
+  // 上传图片
+  async uploadImg () {
+    let imgUrl
+    // 获取 steam
+    const stream = await this.ctx.getFileStream()
+    // 上传基础目录
+    const uploadBasePath = "app/public/upload/"
+    // 生成文件名
+    const filename = Date.now() + "" + Number.parseInt(Math.random() * 10000) + path.extname(stream.filename)
+    // 生成文件夹
+    const dirName = dayjs(Date.now()).format("YYYYMMDD")
+    if (!fs.existsSync(path.join(this.config.baseDir, uploadBasePath, dirName))){
+      fs.mkdirSync(path.join(this.config.baseDir, uploadBasePath, dirName))
+    }
+    // 生成写入路径
+    const target = path.join(this.config.baseDir, uploadBasePath, dirName, filename)
+    // 写入流
+    const writeStream = fs.createWriteStream(target)
+    try {
+      // 写入文件
+      await awaitStreamReady(stream.pipe(writeStream))
+      imgUrl = "http://" + this.ctx.request.header.host + "/public/upload/" + dirName + "/" + filename
+
+    } catch (err) {
+      // 必须将上传的文件流消费掉，要不然浏览器响应会卡死
+      await sendToWormhole(stream)
+      throw err
+    }
+    return imgUrl
+  },
+
 };

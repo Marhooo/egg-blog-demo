@@ -47,5 +47,9 @@ module.exports = app => {
   // 文章修改回显
   router.post("/article/getArticle", isLogin, controller.article.getArticle)
   // 删除文章
-  router.post("/article/delArticle", isLogin, controller.article.delArticle)  
+  router.post("/article/delArticle", isLogin, controller.article.delArticle)
+  // 图片上传
+  router.post("/editor/uploadImg", controller.article.uploadImg)
+  // 发表评论
+  router.post("/comment/addComment", isLogin, controller.comment.addComment)
 };

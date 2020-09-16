@@ -27,6 +27,10 @@
 #### 0913 文章修改回&&删除文章
 >- 这两块的代码自己完成了修正，由于原著中的代码async和promise混着乱写。我全部改成了async和await的写法，并且完成了egg-validate的添加，保证了简单的校验和错误异常的抛出。把校验层写在了service中，因为错误的抓取是写在了service层中。
 >- service层中```this.ctx.validate({id: 'string'})```此处的id是指ctx.request.body中是否有id且是否为string，并不是调用controller层中const的那个id。
+#### 0916 文件上传接口&&发表文章评论
+>- Node中的 Stream 模式上传，参考[Stream](https://eggjs.org/zh-cn/basics/controller.html#stream-%E6%A8%A1%E5%BC%8F),上传文件失败的话必须将上传的文件流消费掉,就需要用到```stream-wormhole```。
+>- postman进行文件上传测试选择form-data，text改为file，输入key：file  ，value：选择文件。
+>- model.create用法参考[Sequelize](https://sequelize.org/master/class/lib/model.js~Model.html#static-method-create)
 
 
 

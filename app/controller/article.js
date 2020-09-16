@@ -47,6 +47,11 @@ class ArticleController extends Controller {
     this.ctx.body = result
   }
 
+  // 富文本上传图片
+  async uploadImg () {
+    const imgurl = await this.ctx.helper.uploadImg()
+    this.ctx.body = { errno: 0, data: [ imgurl ] }
+  }
 
 }
 
