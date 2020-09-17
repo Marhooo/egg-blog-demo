@@ -31,7 +31,8 @@
 >- Node中的 Stream 模式上传，参考[Stream](https://eggjs.org/zh-cn/basics/controller.html#stream-%E6%A8%A1%E5%BC%8F),上传文件失败的话必须将上传的文件流消费掉,就需要用到```stream-wormhole```。
 >- postman进行文件上传测试选择form-data，text改为file，输入key：file  ，value：选择文件。
 >- model.create用法参考[Sequelize](https://sequelize.org/master/class/lib/model.js~Model.html#static-method-create)
-
+#### 0917 回复评论
+>- 在回复评论中自定义了校验规则，```var replyRule = {to_user_id: "string",content: {type: "string", max: 70}, comment_id: "string"}```,校验时```this.ctx.validate(replyRule)```默认校验就是this.ctx.request.body中的内容，不需要指明。参考egg文档[validate](https://eggjs.org/zh-cn/tutorials/restful.html#controller-%E5%BC%80%E5%8F%91)
 
 
 

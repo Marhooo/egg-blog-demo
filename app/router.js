@@ -52,4 +52,6 @@ module.exports = app => {
   router.post("/editor/uploadImg", controller.article.uploadImg)
   // 发表评论
   router.post("/comment/addComment", isLogin, controller.comment.addComment)
+  // 回复评论
+  router.post("/comment/replyComment", isLogin, controller.comment.replyComment)
 };

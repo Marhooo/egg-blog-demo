@@ -21,6 +21,34 @@ class CommentController extends Controller {
     this.ctx.body = result;
   }
 
+  // 回复评论
+  async replyComment () {
+    let result = {}
+    const replyData = this.ctx.request.body
+    replyData.from_user_id = this.ctx.session.user.id
+    const replyResult = await this.ctx.service.comment.replyComment(replyData)
+    if (replyResult) {
+      result = {
+        code: 200,
+        message: "回复成功",
+      }
+    } else {
+      result = {
+        code: 10000,
+        message: "回复失败,请重试",
+      }
+    }
+    this.ctx.body = result
+  }
+  
+  // 评论列表
+  async commentList () {
+    const getListData = this.ctx.request.body
+    const list = await this.ctx.service.comment.commentList(getListData)
+
+    this.ctx.body = list
+  }
+
 
 }
 module.exports = CommentController
