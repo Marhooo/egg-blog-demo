@@ -55,5 +55,7 @@ module.exports = app => {
   // 回复评论
   router.post("/comment/replyComment", isLogin, controller.comment.replyComment)
   // 评论列表
-  router.post("/comment/commentList", isLogin, controller.comment.commentList)  
+  router.get("/comment/commentList", isLogin, controller.comment.commentList)
+  // 删除评论
+  router.post("/comment/delComment", isLogin, controller.comment.delComment)
 };

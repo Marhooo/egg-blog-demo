@@ -49,6 +49,13 @@ class CommentController extends Controller {
     this.ctx.body = list
   }
 
+  // 删除评论
+  async delComment () {
+    const id = this.ctx.request.body.id
+    const result = await this.ctx.service.comment.delComment(id)
+    this.ctx.body = result
+  }
+
 
 }
 module.exports = CommentController

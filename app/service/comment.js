@@ -98,5 +98,39 @@ class CommentService extends Service {
     }
   }
 
+  //删除评论
+  async delComment(cId){
+    let results
+    try{
+      this.ctx.validate({
+        id: "string"
+      })
+      const res = await this.ctx.model.Comment.destroy({
+        where:{
+          id: cId
+        }
+      })
+      if(res>0){
+        results = {
+          code: 200,
+          message: "删除成功",
+        }
+      }else{
+        results = {
+          code: 10000,
+          message: "删除失败",
+        }
+      }
+      return results
+    }catch(err){
+      console.log(err)
+      results = {
+        code: 10000,
+        message: err.message
+      }
+      return results
+    }
+  }
+
 }
 module.exports = CommentService
