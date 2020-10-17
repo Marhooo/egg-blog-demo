@@ -13,7 +13,7 @@ module.exports = () => {
       });
     }
     if (tagRoleName === "超级管理员" && myRoleName !== "超级管理员") {
-      ctx.helper.error(200, 10000, "为获得此操作权限");
+      ctx.helper.error(200, 10000, "未获得此操作权限");
     } else {
       await next();
     }
