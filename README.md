@@ -37,6 +37,8 @@
 >- 卡了好几天，完成了对评论列表的数据库查询及查询结果的添加另外author_name和article_title这两个键，都是从第一张comment表中的author_id和article_id键去另外两张表中找对应的author_name和article_title，然后一并添加到一个results中。整个代码有2中方式写法，一个是空数组中push方法（3个数据库查询结果表数组的解构赋值），还有一个是第一张表原数组map方法（对另两个新数组解构赋值）。其中还有一个莫名其妙的bug就是.toJSON()在```...comment.toJSON()```中必须要加上，也不知道为什么。。。
 #### 1022 修改获取用户列表
 >- 获取用户列表中service层,currentpage改成从前端传进来的实时currentpage值。
+#### 1026 解决0921评论列表中bug关于toJSON()的问题
+>- array.push接受字符串。但是这个comment是一个查询出来的实例对象，需要转换，用sequlize中写在对象上的tojson()方法：把查询实例转换成字符串原值。
 
 
 
