@@ -39,6 +39,8 @@
 >- 获取用户列表中service层,currentpage改成从前端传进来的实时currentpage值。
 #### 1026 解决0921评论列表中bug关于toJSON()的问题
 >- array.push接受字符串。但是这个comment是一个查询出来的实例对象，需要转换，用sequlize中写在对象上的tojson()方法：把查询实例转换成字符串原值。
+#### 1104 logout接口&&session的配置
+>- 前端需要完成logout接口，并完成session的配置
 
 
 

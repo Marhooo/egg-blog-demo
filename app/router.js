@@ -16,6 +16,8 @@ module.exports = app => {
   router.post("/admin/user/register", controller.admin.register.userRegister)
   // 登录接口
   router.post("/admin/user/login", controller.admin.login.userLogin)
+  //登出接口
+  router.post("/admin/user/logout", isLogin, roleAndUseStatus, controller.admin.login.userLogout)
   // 获取当前用户信息
   router.get("/user/getUserInfo", isLogin, controller.admin.login.getUserInfo)
   // 获取用户信息

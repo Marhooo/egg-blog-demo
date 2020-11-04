@@ -104,8 +104,15 @@ class LoginController extends Controller {
     this.ctx.body = await this.ctx.service.admin.login.getUserInfoId(id)
   }
 
+  //用户登出
+  async userLogout () {
+    this.ctx.session.user = null
+    this.ctx.body = {
+      code: 200,
+      message: "登出成功！"
+    }
+  }
 
-  
 }
 
 module.exports = LoginController
