@@ -87,8 +87,8 @@ class LoginController extends Controller {
       this.ctx.body = {
         name: userInfo.name,
         role: userInfo.getDataValue("roleName"),
-        authorityRouter: userInfo.getDataValue("authorityRouter"),
-        permissionButton: userInfo.getDataValue("permissionButton"),
+        authorityRouter: userInfo.getDataValue("authorityRouter") || "",
+        permissionButton: userInfo.getDataValue("permissionButton") || "",
         avatar: userInfo.avatar,
         id: userInfo.id,
       }

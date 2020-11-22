@@ -41,6 +41,8 @@
 >- array.push接受字符串。但是这个comment是一个查询出来的实例对象，需要转换，用sequlize中写在对象上的tojson()方法：把查询实例转换成字符串原值。
 #### 1104 logout接口&&session的配置
 >- 前端需要完成logout接口，并完成session的配置
+#### 1110 上传文件完善
+>- 保证例如user中头像的路径的输入，article中缩略图路径的输入。
 
 
 
