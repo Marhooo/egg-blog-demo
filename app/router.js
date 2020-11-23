@@ -45,7 +45,7 @@ module.exports = app => {
   // 发表文章
   router.post("/article/addArticle", isLogin, controller.article.addArticle)
   // 文章列表
-  router.post("/article/articleList", isLogin, controller.article.articleList)
+  router.get("/article/articleList", isLogin, controller.article.articleList)
   // 文章修改回显
   router.post("/article/getArticle", isLogin, controller.article.getArticle)
   // 删除文章

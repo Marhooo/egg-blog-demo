@@ -25,7 +25,7 @@ class ArticleController extends Controller {
 
   // 查询文章列表
   async articleList () {
-    const getListData = this.ctx.request.body
+    const getListData = this.ctx.request.query
     const list = await this.ctx.service.article.articleList(getListData)
 
     this.ctx.body = list

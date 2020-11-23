@@ -3,6 +3,17 @@
 #### 0901 login和register完成
 >- findById方法注意sequelize的版本
 >- ```replace(/-/g, "")```用于格式化日期，如2016-1-1格式化为201611,```/g ```代表全局，所有的```- ```都替换
+>- jwt.sign和[jwt.verify](https://github.com/auth0/node-jsonwebtoken/blob/master/verify.js)
+```
+// verify a token symmetric - synchronous
+var decoded = jwt.verify(token, 'shhhhh');
+console.log(decoded.foo) // bar
+
+// verify a token symmetric
+jwt.verify(token, 'shhhhh', function(err, decoded) {
+  console.log(decoded.foo) // bar
+});
+```
 #### 0902 获取当前用户信息&&获取用户信息完成
 >- 修改了getAccessToken ()中```return bearerToken && bearerToken.replace("Bearer ", "")```这段代码,在Bearer后面加了一个*空格*,方便Postman加入Bearer Token,这样在前端vue代码中也需要修改了.
 #### 0902 获取用户列表&&修改用户信息完成
@@ -41,8 +52,10 @@
 >- array.push接受字符串。但是这个comment是一个查询出来的实例对象，需要转换，用sequlize中写在对象上的tojson()方法：把查询实例转换成字符串原值。
 #### 1104 logout接口&&session的配置
 >- 前端需要完成logout接口，并完成session的配置
-#### 1110 上传文件完善
+#### 1110 controller层article&&上传文件完善oss方式尝试
 >- 保证例如user中头像的路径的输入，article中缩略图路径的输入。
+>- get接口，请求数据在this.ctx.request.query中。query中传过来的值解构后要保证值parseInt()成number类型，不然sql查询时会转义字符串的''符号。并且获取文章列表中service层,currentpage改成从前端传进来的实时currentpage值。
+
 
 
 

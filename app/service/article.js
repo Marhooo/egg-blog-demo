@@ -20,10 +20,11 @@ class articleService extends Service {
   async articleList (getListData) {
     const { ctx } = this
     let result
-    const { currentPage = 1, pageSize = 10, sort } = getListData
+    //const { currentPage = 1, pageSize = 10, sort } = getListData
+    const { currentPage, pageSize } = getListData
     await this.ctx.model.Article.findAndCountAll({
-      limit: pageSize,
-      offset: pageSize * (currentPage - 1),
+      limit: parseInt(pageSize),
+      offset: parseInt(pageSize) * (parseInt(currentPage) - 1),
     }).then(async res => {
       console.log(res)
       for (let i = 0; i < res.rows.length; i++) {
