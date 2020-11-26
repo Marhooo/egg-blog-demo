@@ -2,7 +2,7 @@ const Service = require("egg").Service
 
 class articleService extends Service {
   // 增加修改文章
-  async seaveOrUpArticle (data) {
+  async saveOrUpArticle (data) {
     let result = ""
     await this.ctx.model.Article.upsert(data).then(res => {
       console.log(res)

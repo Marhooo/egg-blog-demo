@@ -4,7 +4,7 @@ const { cryptoMd5 } = require("../../extend/helper");
 class UserController extends Controller {
   //获取用户列表
   async userList() {
-    const getListData = this.ctx.request.body;
+    const getListData = this.ctx.request.query;
     const list = await this.ctx.service.admin.user.userList(getListData);
     const roleList = await this.ctx.service.admin.role.getRoleList();
     for (let i = 0; i < list.rows.length; i++) {

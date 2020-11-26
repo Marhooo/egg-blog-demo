@@ -52,9 +52,10 @@ jwt.verify(token, 'shhhhh', function(err, decoded) {
 >- array.push接受字符串。但是这个comment是一个查询出来的实例对象，需要转换，用sequlize中写在对象上的tojson()方法：把查询实例转换成字符串原值。
 #### 1104 logout接口&&session的配置
 >- 前端需要完成logout接口，并完成session的配置
-#### 1110 controller层article&&上传文件完善oss方式尝试
+#### 1124 controller层article&&上传文件完善oss方式尝试
 >- 保证例如user中头像的路径的输入，article中缩略图路径的输入。
 >- get接口，请求数据在this.ctx.request.query中。query中传过来的值解构后要保证值parseInt()成number类型，不然sql查询时会转义字符串的''符号。并且获取文章列表中service层,currentpage改成从前端传进来的实时currentpage值。
+>- 评论列表获取也需要改成get接口，并且文章评论service层中把查询到的数据放入results.rows中。
 
 
 

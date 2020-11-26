@@ -5,9 +5,8 @@ class ArticleController extends Controller {
   async addArticle () {
     let result = {}
     const articleData = this.ctx.request.body
-    // articleData.id = articleData.id ? articleData.id: null
     articleData.author = this.ctx.session.user.id
-    const articleResult = await this.ctx.service.article.seaveOrUpArticle(articleData)
+    const articleResult = await this.ctx.service.article.saveOrUpArticle(articleData)
     if (articleResult == true) {
       result = {
         code: 200,

@@ -43,7 +43,7 @@ class CommentController extends Controller {
   
   // 评论列表
   async commentList () {
-    const getListData = this.ctx.request.body
+    const getListData = this.ctx.request.query
     const list = await this.ctx.service.comment.commentList(getListData)
 
     this.ctx.body = list

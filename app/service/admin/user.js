@@ -4,12 +4,11 @@ class UserService extends Service{
   // 获取用户列表
   async userList (getListData) {
     let result
-    const { currentPage: currentPage, pageSize = 10 } = getListData
+    const { currentPage, pageSize } = getListData
     await this.ctx.model.SystemUser.findAndCountAll({
-      limit: pageSize,
-      offset: pageSize * (currentPage - 1),
-    }).then(async res => {
-      console.log(res)
+      limit: parseInt(pageSize),
+      offset: parseInt(pageSize) * (parseInt(currentPage) - 1)
+    }).then(res => {
       result = res
     }).catch(err => {
       console.log(err)

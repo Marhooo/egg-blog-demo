@@ -55,24 +55,27 @@ class CommentService extends Service {
 
   //评论列表
   async commentList(getListData){
-    const {currentPage = 1, pageSize = 10} = getListData
-    let results = []
+    const { currentPage, pageSize } = getListData
+    let results = {
+      rows: []
+    }
     try {
       let res = await this.ctx.model.Comment.findAndCountAll({
-        limit: pageSize,
-        offset: pageSize * (currentPage - 1)
+        limit: parseInt(pageSize),
+        offset: parseInt(pageSize) * (parseInt(currentPage) - 1)
       })
       for(let i=0; i < res.rows.length; i++){
         const comment = res.rows[i];
         //console.log(comment);
         const user = await this.ctx.model.SystemUser.findById(comment.author_id);
         const article = await this.ctx.model.Article.findById(comment.article_id);
-        results.push({
+        results.rows.push({
           ...comment.toJSON(),
           author_name : user.name,
           article_title : article.title
         });
       }
+
       // let user = [];
       // let article = [];
       // for(let i=0; i < res.rows.length; i++){
@@ -113,12 +116,12 @@ class CommentService extends Service {
       if(res>0){
         results = {
           code: 200,
-          message: "删除成功",
+          message: "删除成功!",
         }
       }else{
         results = {
           code: 10000,
-          message: "删除失败",
+          message: "删除失败!",
         }
       }
       return results

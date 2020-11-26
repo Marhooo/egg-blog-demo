@@ -23,7 +23,7 @@ module.exports = app => {
   // 获取用户信息
   router.post("/user/getUserInfoId", isLogin, roleAndUseStatus, controller.admin.login.getUserInfoId)
   // 获取用户列表
-  router.post("/user/userList", isLogin, roleAndUseStatus, controller.admin.user.userList)
+  router.get("/user/userList", isLogin, roleAndUseStatus, controller.admin.user.userList)
   // 修改用户信息
   router.post("/user/editUserInfo", isLogin, roleAndUseStatus, editAdmin, controller.admin.user.editUserInfo)
   // 修改密码
