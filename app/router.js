@@ -14,12 +14,16 @@ module.exports = app => {
 
   // 注册接口
   router.post("/admin/user/register", controller.admin.register.userRegister)
+  // 微信小程序openid获取接口
+  router.post("/customer/wxlogin/openid", controller.customer.wxlogin.openid)
+  // 微信小程序登录接口
+  router.post("/customer/user/wxlogin", controller.customer.wxlogin.wxLogin)
   // 登录接口
   router.post("/admin/user/login", controller.admin.login.userLogin)
   //登出接口
   router.post("/admin/user/logout", isLogin, roleAndUseStatus, controller.admin.login.userLogout)
-  // 获取当前用户信息
-  router.get("/user/getUserInfo", isLogin, controller.admin.login.getUserInfo)
+  // 获取当前用户信息且session绑定
+  router.get("/user/getUserInfo", controller.admin.login.getUserInfo)
   // 获取用户信息
   router.post("/user/getUserInfoId", isLogin, roleAndUseStatus, controller.admin.login.getUserInfoId)
   // 获取用户列表

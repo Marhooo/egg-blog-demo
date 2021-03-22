@@ -1,11 +1,11 @@
 const Service = require("egg/index").Service
 
-class UserService extends Service{
+class LoginService extends Service{
   async findUsername (username) {
-      const user = await this.ctx.model.SystemUser.findOne({
-        where: { username },
-      })
-      return user
+    const user = await this.ctx.model.SystemUser.findOne({
+      where: { username },
+    })
+    return user
   }
   // 生成 token 保存数据库
   async saveToken (data) {
@@ -59,4 +59,4 @@ class UserService extends Service{
   
 }
 
-module.exports = UserService
+module.exports = LoginService
