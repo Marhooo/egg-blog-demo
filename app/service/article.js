@@ -44,7 +44,20 @@ class articleService extends Service {
   //文章回显
   async getArticle(aId){
     try{
-      return await this.ctx.model.Article.findById(aId)
+      const articleresult = await this.ctx.model.Article.findById(aId)
+      if(articleresult) {
+        articleresult.read_num +=1
+        await this.ctx.model.Article.update({
+          read_num: articleresult.read_num
+        }, {
+          where: {
+            id: aId
+          }
+        })
+        return articleresult     
+      } else {
+        return articleresult
+      }
     }catch(err){
       console.log(err)
     }
