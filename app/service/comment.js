@@ -66,9 +66,11 @@ class CommentService extends Service {
       })
       for(let i=0; i < res.rows.length; i++){
         const comment = res.rows[i];
-        //console.log(comment);
+        //console.log(comment.toJSON());
+        //console.log({haha: comment})
         const user = await this.ctx.model.SystemUser.findById(comment.author_id);
         const article = await this.ctx.model.Article.findById(comment.article_id);
+        //console.log(user)
         results.rows.push({
           ...comment.toJSON(),
           author_name : user.name,

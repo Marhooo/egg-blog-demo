@@ -49,7 +49,8 @@ jwt.verify(token, 'shhhhh', function(err, decoded) {
 #### 1022 修改获取用户列表
 >- 获取用户列表中service层,currentpage改成从前端传进来的实时currentpage值。
 #### 1026 解决0921评论列表中bug关于toJSON()的问题
->- array.push接受字符串。但是这个comment是一个查询出来的实例对象，需要转换，用sequlize中写在对象上的tojson()方法：把查询实例转换成字符串原值。
+>- array.push接受传入简单对象。但是这个comment是一个查询出来的实例对象，需要用sequelize内置的tojson方法进行转换，把查询实例转换成简单的对象，而不是一个查询到的sequelize实例。
+服务端返回对象时，egg框架内置会把对象转化成json字符串格式进行http传输，框架也默认了application/json的传输方式。
 #### 1104 logout接口&&session的配置
 >- 前端需要完成logout接口，并完成session的配置
 #### 1124 controller层article&&上传文件完善oss方式尝试
