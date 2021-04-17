@@ -12,6 +12,9 @@ module.exports = app => {
 
   router.get('/', controller.home.index);
 
+
+  //测试接口
+  router.get("/testapi", controller.admin.atest.testapi)
   // 注册接口
   router.post("/admin/user/register", controller.admin.register.userRegister)
   // 微信小程序openid获取接口
