@@ -21,3 +21,8 @@ exports.session = {
   httpOnly: true,
   encrypt: true,
 };
+
+exports.cors = {
+  enable: true,
+  package: 'egg-cors',
+}

@@ -31,7 +31,12 @@ module.exports = appInfo => {
   config.jwt = {
     secret: "595485548",
     enable: false,
-  }
+  };
+
+  config.cors = {
+    origin: '*', // 匹配规则  域名+端口  *则为全匹配
+    allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
+  };
 
   return {
     ...config,
