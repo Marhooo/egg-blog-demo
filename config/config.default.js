@@ -33,9 +33,16 @@ module.exports = appInfo => {
     enable: false,
   };
 
+  // config.cors = {
+  //   origin: '*', // 匹配规则  域名+端口  *则为全匹配
+  //   allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
+  //   credentials: true
+  // };
+
   config.cors = {
-    origin: '*', // 匹配规则  域名+端口  *则为全匹配
+    origin: ctx => ctx.get('origin'),
     allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
+    credentials: true
   };
 
   return {
