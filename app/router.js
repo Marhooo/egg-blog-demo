@@ -8,6 +8,7 @@ module.exports = app => {
   const isLogin = middleware.verifyToken()
   const roleAndUseStatus = middleware.roleAndUseStatus()
   const editAdmin = middleware.editAdmin()
+  const editRole = middleware.editRole()
 
 
   router.get('/', controller.home.index);
@@ -42,7 +43,7 @@ module.exports = app => {
   // 增加角色
   router.post("/permissions/addRole", isLogin, roleAndUseStatus, controller.admin.role.addRole)
   // 删除角色
-  router.post("/permissions/delRole", isLogin, roleAndUseStatus, controller.admin.role.delRole)
+  router.post("/permissions/delRole", isLogin, editRole, roleAndUseStatus, controller.admin.role.delRole)
   // 分配角色权限
   router.post("/permissions/rolePermissions", isLogin, roleAndUseStatus, controller.admin.role.rolePermissions)
   // 获取角色所拥有的权限
