@@ -5,7 +5,8 @@ module.exports = app => {
 
   const Article = db.defineModel(app, "articles", {
     title: { type: STRING, allowNull: false }, // 标题
-    sort: STRING, // 分类
+    describe: STRING, // 文章描述
+    article_label: TEXT("long"),
     top: {
       type: BOOLEAN,
       defaultValue: false,

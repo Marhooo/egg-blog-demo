@@ -91,6 +91,7 @@ class LoginController extends Controller {
         permissionButton: userInfo.getDataValue("permissionButton") || "",
         avatar: userInfo.avatar,
         id: userInfo.id,
+        //openid: userInfo.openid
       }
     } else {
       await this.ctx.helper.error(401, 10000, "该账号不存在")

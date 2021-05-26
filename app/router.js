@@ -22,9 +22,9 @@ module.exports = app => {
   router.post("/customer/wxlogin/openid", controller.customer.wxlogin.openid)
   // 微信小程序登录接口
   router.post("/customer/user/wxlogin", controller.customer.wxlogin.wxLogin)
-  // 登录接口
+  // 后台登录接口
   router.post("/admin/user/login", controller.admin.login.userLogin)
-  //登出接口
+  // 登出接口
   router.post("/admin/user/logout", isLogin, roleAndUseStatus, controller.admin.login.userLogout)
   // 获取当前用户信息且session绑定
   router.get("/user/getUserInfo", controller.admin.login.getUserInfo)
@@ -48,12 +48,25 @@ module.exports = app => {
   router.post("/permissions/rolePermissions", isLogin, roleAndUseStatus, controller.admin.role.rolePermissions)
   // 获取角色所拥有的权限
   router.post("/permissions/searchRolePermissions", isLogin, roleAndUseStatus, controller.admin.role.searchRolePermissions)
+  /**************************************************************** */
+
+  //添加修改学术领域块
+  router.post("/academic/addAcademicField", isLogin, controller.academicfield.addAcademicField)
+  //查找学术领域
+  router.get("/academic/getAcademicField", isLogin, controller.academicfield.getAcademicField)
+  //添加修改文章标签
+  router.post("/articlelabel/addArticleLabel", isLogin, controller.articlelabel.addArticleLabel)
+  //查找文章标签
+  router.get("/articlelabel/getArticleLabel", isLogin, controller.articlelabel.getArticleLabel)
 
   /**************************************************************** */
+
   // 发表文章
   router.post("/article/addArticle", isLogin, controller.article.addArticle)
   // 文章列表
   router.get("/article/articleList", isLogin, controller.article.articleList)
+  //获取具体标签文章列表
+  router.get("/article/articleInLabel", isLogin, controller.article.articleInLabel)
   // 文章修改回显
   router.post("/article/getArticle", isLogin, controller.article.getArticle)
   // 删除文章
@@ -68,4 +81,11 @@ module.exports = app => {
   router.get("/comment/commentList", isLogin, controller.comment.commentList)
   // 删除评论
   router.post("/comment/delComment", isLogin, controller.comment.delComment)
+
+  /**************************************************************** */
+
+  //创建支付订单
+  router.post("/payment/addPayOrder", isLogin, controller.customer.payment.addPayOrder)
+  //小程序支付统一下单接口
+  router.post("/payment/payWechatMini", isLogin, controller.customer.payment.payWechatMini)
 };
