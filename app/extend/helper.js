@@ -6,6 +6,12 @@ const sendToWormhole = require("stream-wormhole")
 const awaitStreamReady = require("await-stream-ready").write
 
 module.exports = {
+  //微信支付签名函数
+  wechatPayCrypto(message) {
+    const privateKeyCertificate = fs.readFileSync('app/ca/apiclient_key.pem')
+    return crypto.createSign('sha256WithRSAEncryption').update(message).sign(privateKeyCertificate, "base64")    
+  },
+
   // MD5 对密码和秘钥进行混合双重加密
   async cryptoMd5(password, key) {
     const hash1 = await crypto.createHash("md5").update(password).digest("hex");
