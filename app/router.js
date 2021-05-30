@@ -88,4 +88,8 @@ module.exports = app => {
   router.post("/payment/addPayOrder", isLogin, controller.customer.payment.addPayOrder)
   //小程序支付统一下单接口
   router.post("/payment/payWechatMini", isLogin, controller.customer.payment.payWechatMini)
+  //查询微信小程序订单状态
+  router.get("/payment/inquirePayWechatMini", isLogin, controller.customer.payment.inquirePayWechatMini)
+  //查询微信支付订单列表
+  router.post("/payment/inquirePayList", isLogin, controller.customer.payment.inquirePayList)
 };

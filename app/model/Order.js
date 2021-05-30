@@ -7,7 +7,9 @@ module.exports = app =>{
         mchid: INTEGER,  //入账微信支付号
         appid: STRING,  //入账绑定主体应用:小程序appid、公众号appid？
         payer_id: UUID,  //购买人open_id
-        pay_status: { type: STRING, defaultValue: "1" }, //0:已取消, 1:已生成, 2:已支付
+        trade_type: STRING,  //交易类型 JSAPI：公众号、小程序支付 NATIVE：扫码支付 APP：APP支付 MICROPAY：付款码支付 MWEB：H5支付 FACEPAY：刷脸支付
+        prepay_id: STRING,  //预支付交易会话标识   如果客户第一次放弃支付可以在订单管理中重新呼起此单支付
+        pay_status: { type: STRING, defaultValue: "1" }, //0:已取消, 1:待支付, 2:已支付
         product_description: STRING,
         pay_total: INTEGER,   //订单总价
         original_price: INTEGER, //订单原价
