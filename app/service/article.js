@@ -18,7 +18,7 @@ class articleService extends Service {
       }
     } catch (err) {
       console.log(err);
-      this.ctx.helper.error(200, 10204, '文章添加更新失败');
+      this.ctx.helper.error(200, 10404, '文章添加更新失败');
     }
   }
 
@@ -29,6 +29,7 @@ class articleService extends Service {
       const result = await this.ctx.model.Article.findAndCountAll({
         limit: parseInt(pageSize),
         offset: parseInt(pageSize) * (parseInt(currentPage) - 1),
+        order: [['created_at', 'DESC']]   //按时间顺序返回，DESC按最新
       });
       //灰色部分代码有问题的根本原因是使用 promise 或 async 函数作为 forEach() 等类似方法的 callback 参数，导致队列接不到回执。
       // result.rows.forEach(async element => {

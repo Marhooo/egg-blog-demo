@@ -8,16 +8,57 @@ class PayMentService extends Service {
       options.time_expire = Math.round(new Date().getTime() / 1000) + 15 * 60;
       //const {appid, mchid, product_description, pay_total, original_price, payer_client_ip} = options
       const result = await this.ctx.model.Order.create(options);
-      this.ctx.body = result;
+      this.ctx.body = {
+        code: 200,
+        data: result,
+      };
     } catch (err) {
       console.log(err);
       this.ctx.helper.error(200, 10404, '支付订单创建失败');
     }
   }
-  //统一微信小程序下单拿prepay_id
+  //统一微信小程序下单拿prepay_id 且关闭已超时订单
   async getPayWechatMini(options) {
     try {
       const { appid, mchid, product_description, pay_total, currency, payer_id, id } = options;
+      //下单前先查询当前用户在数据库中的订单状态为未支付，且已过时的订单，进行关单操作
+      const shouldBeClosed = await this.ctx.model.Order.findAll({
+        where: {
+          pay_status: '1',
+          payer_id: payer_id,
+        },
+      });
+      for (let i = 0; i < shouldBeClosed.length; i++) {
+        if (shouldBeClosed[i].time_expire <= Math.round(new Date().getTime() / 1000)) {
+          const params = {
+            mchid: mchid,
+          };
+          const url = `https://api.mch.weixin.qq.com/v3/pay/transactions/out-trade-no/${shouldBeClosed[i].id}/close`;
+          const method = 'POST';
+          const canonicalUrl = `/v3/pay/transactions/out-trade-no/${shouldBeClosed[i].id}/close`;
+          const timep = Math.round(new Date().getTime() / 1000);
+          const nonceStr = `${Date.now()}`;
+          const data = JSON.stringify(params);
+          const message =
+            method + '\n' + canonicalUrl + '\n' + timep + '\n' + nonceStr + '\n' + data + '\n';
+          const cryptoRsa = this.ctx.helper.wechatPaySignCrypto(message);
+          await this.ctx.curl(url, {
+            dataType: 'json',
+            method: 'POST',
+            data: params,
+            timeout: 6000,
+            headers: {
+              'content-type': 'application/json',
+              Authorization: `WECHATPAY2-SHA256-RSA2048 mchid="${mchid}",nonce_str="${nonceStr}",signature="${cryptoRsa}",timestamp="${timep}",serial_no="1A2CEAD5617A2E017132CCA4AAAC10C1FA265703"`,
+            },
+          });
+          await this.ctx.model.Order.upsert({
+            pay_status: '0',
+            id: shouldBeClosed[i].id,
+          });
+        }
+      }
+      //以下是拿prepay_id过程
       const params = {
         mchid: mchid,
         out_trade_no: id,
@@ -40,7 +81,7 @@ class PayMentService extends Service {
       const data = JSON.stringify(params);
       const message =
         method + '\n' + canonicalUrl + '\n' + timep + '\n' + nonceStr + '\n' + data + '\n';
-      const cryptoRsa = this.ctx.helper.wechatPayCrypto(message);
+      const cryptoRsa = this.ctx.helper.wechatPaySignCrypto(message);
       const res = await this.ctx.curl(url, {
         dataType: 'json',
         method: 'POST',
@@ -53,8 +94,8 @@ class PayMentService extends Service {
       });
       const paySign_message =
         appid + '\n' + timep + '\n' + nonceStr + '\n' + `prepay_id=${res.data.prepay_id}` + '\n';
-      const paySign = this.ctx.helper.wechatPayCrypto(paySign_message);
-      console.log(res);
+      const paySign = this.ctx.helper.wechatPaySignCrypto(paySign_message);
+      //console.log(res);
       if (res.data.prepay_id) {
         await this.ctx.model.Order.upsert({
           id: id,
@@ -74,7 +115,7 @@ class PayMentService extends Service {
             data: {
               package: `prepay_id=${res.data.prepay_id}`,
               id: id,
-              timeStamp: timep,
+              timeStamp: `${timep}`,
               nonceStr: nonceStr,
               signType: 'RSA',
               paySign: paySign,
@@ -108,7 +149,7 @@ class PayMentService extends Service {
       const timep = Math.round(new Date().getTime() / 1000);
       const nonceStr = `${Date.now()}`;
       const message = method + '\n' + canonicalUrl + '\n' + timep + '\n' + nonceStr + '\n' + '\n';
-      const cryptoRsa = this.ctx.helper.wechatPayCrypto(message);
+      const cryptoRsa = this.ctx.helper.wechatPaySignCrypto(message);
       const res = await this.ctx.curl(url, {
         dataType: 'json',
         method: 'GET',

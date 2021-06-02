@@ -6,11 +6,37 @@ const sendToWormhole = require("stream-wormhole")
 const awaitStreamReady = require("await-stream-ready").write
 
 module.exports = {
+  //微信APIv3密钥解密微信平台证书加密公钥函数，解密出来的公钥放入'app/ca'
+  //wechatApiV3Decrypt(){}
+
   //微信支付签名函数
-  wechatPayCrypto(message) {
+  wechatPaySignCrypto(message) {
     const privateKeyCertificate = fs.readFileSync('app/ca/apiclient_key.pem')
     return crypto.createSign('sha256WithRSAEncryption').update(message).sign(privateKeyCertificate, "base64")    
   },
+
+  //微信支付签名验证函数
+  //wechatPayVerifyCrypto(){}
+
+  //微信支付敏感参数信息加密，用微信平台证书解密公钥来加密
+  // wechatPayEncrypt(plaintext){
+  //   const publicCertificate = fs.readFileSync('app/ca/')
+  //   return crypto.publicEncrypt({
+  //     oaepHash: 'sha1',
+  //     key: publicCertificate,
+  //     padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+  //   }, Buffer.from(plaintext, 'utf8')).toString('base64');
+  // },
+
+  //微信支付敏感参数信息解密，用商户API私钥来解密
+  // wechatPayDecrypt(ciphertext) {
+  //   const privateKeyCertificate = fs.readFileSync('app/ca/apiclient_key.pem')
+  //   return crypto.privateDecrypt({
+  //     oaepHash: 'sha1',
+  //     key: privateKeyCertificate,
+  //     padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+  //   }, Buffer.from(ciphertext, 'base64')).toString('utf8');    
+  // },
 
   // MD5 对密码和秘钥进行混合双重加密
   async cryptoMd5(password, key) {

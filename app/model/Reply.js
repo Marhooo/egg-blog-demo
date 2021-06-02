@@ -8,11 +8,11 @@ module.exports = (app) => {
     from_user_id: {
       type: STRING,
       allowNull: false,
-    }, // 作者id
+    }, // 当前评论人id
     comment_id: {
       type: STRING,
       allowNull: false,
-    }, // 评论id
+    }, // 评论文章id
     to_user_id: {
       type: STRING,
       allowNull: false,
