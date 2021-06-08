@@ -15,4 +15,4 @@ typings/
 .vscode/
 public/
 ca/
-config/config.prod.js
+*.prod.js
