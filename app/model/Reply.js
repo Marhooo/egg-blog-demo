@@ -16,7 +16,10 @@ module.exports = (app) => {
     to_user_id: {
       type: STRING,
       allowNull: false,
-    }, // 回复对象id
+    }, // 评论对象id
+    to_reply_user_id: {
+      type: STRING     
+    } // 回复对象id（抖音评论中对某个回复进行回复，可以为空）
   });
 
   return Reply;

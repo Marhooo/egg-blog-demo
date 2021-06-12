@@ -116,6 +116,91 @@ class CommentService extends Service {
     }
   }
 
+  //某篇文章的评论列表(篾条文章第一层评论附带5条reply)
+  async getSingleArticleCommentList(options) {
+    try {
+      const { currentPage, pageSize, article_id } = options;
+      const result = await this.ctx.model.Comment.findAndCountAll({
+        limit: parseInt(pageSize),
+        offset: parseInt(pageSize) * (parseInt(currentPage) - 1),
+        order: [['created_at', 'DESC']], //按时间顺序返回，DESC按最新
+        where: {
+          article_id: article_id,
+        },
+      });
+      for (let i = 0; i < result.rows.length; i++) {
+        const resUser = await this.ctx.model.SystemUser.findById(result.rows[i].author_id);
+        result.rows[i].dataValues.author = resUser.name;
+        const resReply = await this.ctx.model.Reply.findAll({
+          limit: 5,
+          offset: 0,
+          order: [['created_at', 'DESC']],
+          where: {
+            to_user_id: result.rows[i].author_id,
+            comment_id: result.rows[i].id,
+          },
+        });
+        if (resReply) {
+          for (let j = 0; j < resReply.length; j++) {
+            const resFromUser = await this.ctx.model.SystemUser.findById(resReply[j].from_user_id);
+            const resToUser = await this.ctx.model.SystemUser.findById(resReply[j].to_user_id);
+            const resToReplyUser = await this.ctx.model.SystemUser.findById(
+              resReply[j].to_reply_user_id
+            );
+            resReply[j].dataValues.from_author = resFromUser.name;
+            resReply[j].dataValues.to_author = resToUser.name;
+            if (resToReplyUser) {
+              resReply[j].dataValues.to_reply_author = resToReplyUser.name;
+            }
+          }
+        }
+        result.rows[i].dataValues.child = resReply;
+      }
+      this.ctx.body = {
+        code: 200,
+        data: result,
+      };
+    } catch (err) {
+      console.log(err);
+      this.ctx.helper.error(200, 10404, '查询失败');
+    }
+  }
+
+  //文章评论中对一个评论的回复讨论列表
+  async getCommentReplyList(options) {
+    try {
+      //搜索底5个reply之后的数据
+      const { currentPage, pageSize, comment_id } = options;
+      const result = await this.ctx.model.Reply.findAndCountAll({
+        limit: parseInt(pageSize),
+        offset: parseInt(pageSize) * (parseInt(currentPage) - 1),
+        order: [['created_at', 'DESC']], //按时间顺序返回，DESC按最新
+        where: {
+          comment_id: comment_id,
+        },
+      });
+      for (let i = 0; i < result.rows.length; i++) {
+        const resFromUser = await this.ctx.model.SystemUser.findById(result.rows[i].from_user_id);
+        const resToUser = await this.ctx.model.SystemUser.findById(result.rows[i].to_user_id);
+        const resToReplyUser = await this.ctx.model.SystemUser.findById(
+          result.rows[i].to_reply_user_id
+        );
+        result.rows[i].dataValues.from_author = resFromUser.name;
+        result.rows[i].dataValues.to_author = resToUser.name;
+        if (resToReplyUser) {
+          result.rows[i].dataValues.to_reply_author = resToReplyUser.name;
+        }
+      }
+      this.ctx.body = {
+        code: 200,
+        data: result,
+      };
+    } catch (err) {
+      console.log(err);
+      this.ctx.helper.error(200, 10404, '查询失败');
+    }
+  }
+
   //删除评论
   async delComment(cId) {
     let results;

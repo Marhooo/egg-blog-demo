@@ -77,8 +77,12 @@ module.exports = app => {
   router.post("/comment/addComment", isLogin, controller.comment.addComment)
   // 回复评论
   router.post("/comment/replyComment", isLogin, controller.comment.replyComment)
-  // 评论列表
+  // 评论总列表
   router.get("/comment/commentList", isLogin, controller.comment.commentList)
+  // 某篇文章的评论列表
+  router.post("/comment/singleArticleCommentList", isLogin, controller.comment.singleArticleCommentList)
+  // 文章评论中对某评论的回复列表
+  router.post("/comment/commentReplyList", isLogin, controller.comment.commentReplyList)
   // 删除评论
   router.post("/comment/delComment", isLogin, controller.comment.delComment)
 

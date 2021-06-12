@@ -38,12 +38,24 @@ class CommentController extends Controller {
     }
   }
   
-  // 评论列表
+  // 评论总列表
   async commentList () {
     const getListData = this.ctx.request.query
     const list = await this.ctx.service.comment.commentList(getListData)
 
     this.ctx.body = list
+  }
+
+  // 查询出某篇文章的评论列表
+  async singleArticleCommentList () {
+    const getListData = this.ctx.request.body
+    await this.ctx.service.comment.getSingleArticleCommentList(getListData)
+  }
+
+  // 查询文章评论中对一个评论的回复讨论列表
+  async commentReplyList() {
+    const getListData = this.ctx.request.body
+    await this.ctx.service.comment.getCommentReplyList(getListData)    
   }
 
   // 删除评论
