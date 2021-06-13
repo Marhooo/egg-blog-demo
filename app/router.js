@@ -18,10 +18,10 @@ module.exports = app => {
   router.get("/testapi", controller.admin.atest.testapi)
   // 注册接口
   router.post("/admin/user/register", controller.admin.register.userRegister)
-  // 微信小程序openid获取接口
-  router.post("/customer/wxlogin/openid", controller.customer.wxlogin.openid)
-  // 微信小程序登录接口
-  router.post("/customer/user/wxlogin", controller.customer.wxlogin.wxLogin)
+  //测试用的微信登录接口换取token
+  router.post("/customer/user/wxLogin", controller.customer.wxlogin.wxLogin)
+  // 微信小程序注册/登录接口(换取token)
+  router.post("/customer/user/wxRegisterLogin", controller.customer.wxlogin.wxRegisterLogin)
   // 后台登录接口
   router.post("/admin/user/login", controller.admin.login.userLogin)
   // 登出接口
