@@ -9,7 +9,7 @@ class CommentController extends Controller {
         content: 'string',
       });
       const commentData = this.ctx.request.body;
-      commentData.author_id = this.ctx.session.user.id;    
+      commentData.commenter_id = this.ctx.session.user.id;    
       await this.ctx.service.comment.addComment(commentData)
     } catch(err) {
       err.warn = '参数错误'

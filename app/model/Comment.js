@@ -8,11 +8,15 @@ module.exports = (app) => {
     author_id: {
       type: STRING,
       allowNull: false,
-    }, // 作者id
+    }, // 作者id  
     article_id: {
       type: STRING,
       allowNull: false,
     }, // 文章id
+    commenter_id: {
+      type: STRING,
+      allowNull: false,
+    }, // 评论者id    
     praise_num: {
       type: INTEGER,
       defaultValue: 0,

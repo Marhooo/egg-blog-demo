@@ -29,9 +29,21 @@ function defineModel (app, name, attributes) {
     },
   }
 
+  // attrs.createdAt = {
+  //   type: app.Sequelize.DATE, 
+  //   field: 'created_at',
+  // }
+
+  // attrs.updatedAt = {
+  //   type: app.Sequelize.DATE, 
+  //   field: 'updated_at',
+  // }  
+
   return app.model.define(name, attrs, {
-    created_at: "created_at",
-    updated_at: "updated_at",
+    // 如果需要sequelize帮你维护createdAt,updatedAt和deletedAt必须先启用timestamps功能
+    timestamps: true,
+    createdAt : 'created_at',
+    updatedAt : 'updated_at',   
     version: true,
     freezeTableName: true, // Model 对应的表名将与model名相同,不会变为复数
   })

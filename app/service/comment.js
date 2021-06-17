@@ -116,7 +116,7 @@ class CommentService extends Service {
     }
   }
 
-  //某篇文章的评论列表(篾条文章第一层评论附带5条reply)
+  //某篇文章的评论列表(文章第一层评论附带5条reply)
   async getSingleArticleCommentList(options) {
     try {
       const { currentPage, pageSize, article_id } = options;
@@ -129,32 +129,35 @@ class CommentService extends Service {
         },
       });
       for (let i = 0; i < result.rows.length; i++) {
-        const resUser = await this.ctx.model.SystemUser.findById(result.rows[i].author_id);
-        result.rows[i].dataValues.author = resUser.name;
-        const resReply = await this.ctx.model.Reply.findAll({
+        const resUser = await this.ctx.model.SystemUser.findById(result.rows[i].commenter_id);
+        result.rows[i].dataValues.commenter = resUser.name;
+        result.rows[i].dataValues.commenter_avatar = resUser.avatar
+        const resReply = await this.ctx.model.Reply.findAndCountAll({
           limit: 5,
           offset: 0,
-          order: [['created_at', 'DESC']],
+          order: [['created_at']],
           where: {
-            to_user_id: result.rows[i].author_id,
+            to_user_id: result.rows[i].commenter_id,
             comment_id: result.rows[i].id,
           },
         });
         if (resReply) {
-          for (let j = 0; j < resReply.length; j++) {
-            const resFromUser = await this.ctx.model.SystemUser.findById(resReply[j].from_user_id);
-            const resToUser = await this.ctx.model.SystemUser.findById(resReply[j].to_user_id);
+          for (let j = 0; j < resReply.rows.length; j++) {
+            const resFromUser = await this.ctx.model.SystemUser.findById(resReply.rows[j].from_user_id);
+            const resToUser = await this.ctx.model.SystemUser.findById(resReply.rows[j].to_user_id);
             const resToReplyUser = await this.ctx.model.SystemUser.findById(
-              resReply[j].to_reply_user_id
+              resReply.rows[j].to_reply_user_id
             );
-            resReply[j].dataValues.from_author = resFromUser.name;
-            resReply[j].dataValues.to_author = resToUser.name;
+            resReply.rows[j].dataValues.from_author = resFromUser.name;
+            resReply.rows[j].dataValues.from_author_avatar = resFromUser.avatar;
+            resReply.rows[j].dataValues.to_author = resToUser.name;
             if (resToReplyUser) {
-              resReply[j].dataValues.to_reply_author = resToReplyUser.name;
+              resReply.rows[j].dataValues.to_reply_author = resToReplyUser.name;
             }
           }
         }
-        result.rows[i].dataValues.child = resReply;
+        result.rows[i].dataValues.child_count = resReply.count;
+        result.rows[i].dataValues.child = resReply.rows;
       }
       this.ctx.body = {
         code: 200,

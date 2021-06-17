@@ -11,5 +11,7 @@ exports.sequelize = {
     // 密码
     password: "cgz123456",
     // 数据库名
-    database: "egg_server"
+    database: "egg_server",
+    //东八时区
+    timezone: '+08:00'
 };
