@@ -38,7 +38,7 @@ class articleService extends Service {
       // });
       for (let i = 0; i < result.rows.length; i++) {
         const resUser = await this.ctx.model.SystemUser.findById(result.rows[i].author);
-        result.rows[i].dataValues.author = resUser.name;
+        result.rows[i].dataValues.author_name = resUser.name;
       }
       this.ctx.body = {
         code: 200,
@@ -74,6 +74,70 @@ class articleService extends Service {
     }
   }
 
+  //文章点赞或取消点赞
+  async adcArticleLike(options) {
+    const Op = this.app.Sequelize.Op;
+    try {
+      const {article_id, user_id} = options
+      const result = await this.ctx.model.ArticleUserLikes.findOne({
+        where: {
+          [Op.and]: [
+            {article_id: article_id},
+            {user_id: user_id}
+          ]
+        }
+      })
+      if(result) {
+        await this.ctx.model.ArticleUserLikes.destroy({
+          where: {
+            id: result.id
+          }
+        })
+        this.ctx.body = {
+          code: 200,
+          message: '取消点赞成功',
+        };
+      } else {
+        await this.ctx.model.ArticleUserLikes.create(options)
+        this.ctx.body = {
+          code: 200,
+          message: '点赞成功',
+        };
+      }      
+    } catch(err) {
+      console.log(err)
+      this.ctx.helper.error(200, 10404, '点赞失败')
+    }
+  }
+
+  //获取点赞相关用户信息
+  async getLikeUser(options) {
+    try{
+      //这里是inner join (取A,B的交集)，还有一种是LEFT JOIN/LEFT OUTER JOIN相同，(取A全集，B中与A的交集)
+      // const result = await this.ctx.model.ArticleUserLikes.findAll({
+      //   include: {
+      //     model: this.app.model.SystemUser,
+      //     as: 'Instruments',
+      //     where: {
+      //       user_id: options.id
+      //     }
+      //   }
+      // })
+      const result = await this.app.model.query(
+        //'SELECT `like`.`user_id`, `like`.`id`, `Instruments`.`name` AS `Instruments.name`, `Instruments`.`avatar` AS `Instruments.avatar` FROM `articleuserlikes` AS `like` INNER JOIN `system_users` AS `Instruments` ON `like`.`user_id` = `Instruments`.`id` AND `like`.`article_id` = :article_id',
+        'SELECT `articleuserlikes`.`user_id`, `articleuserlikes`.`id`, `system_users`.`name`, `system_users`.`avatar` FROM articleuserlikes INNER JOIN system_users ON `articleuserlikes`.`user_id` = `system_users`.`id` AND `articleuserlikes`.`article_id` = :article_id',
+        {
+          replacements: { article_id: options.id },
+          type: this.app.Sequelize.QueryTypes.SELECT
+        }
+      )
+      this.ctx.body = result
+    } catch(err) {
+      console.log(err)
+      this.ctx.helper.error(200, 10404, '查询失败!')
+    }
+  }
+
   //文章回显
   async getArticle(aId) {
     try {
@@ -100,35 +164,24 @@ class articleService extends Service {
   }
 
   //删除文章
-  async delArticle(aId) {
-    let results;
+  async delArticle(options) {
     try {
-      this.ctx.validate({
-        id: 'string',
-      });
-      const res = await this.ctx.model.Article.destroy({
+      const result = await this.ctx.model.Article.destroy({
         where: {
-          id: aId,
-        },
-      });
-      if (res > 0) {
-        results = {
+          id: options.id
+        }
+      })
+      if(result) {
+        this.ctx.body = {
           code: 200,
-          message: '删除成功',
+          message: '文章删除成功!',
         };
       } else {
-        results = {
-          code: 10000,
-          message: '删除失败',
-        };
+        this.ctx.helper.error(200, 10204, '文章删除失败!')       
       }
-      return results;
-    } catch (err) {
-      results = {
-        code: 10000,
-        message: err.message,
-      };
-      return results;
+    } catch(err) {
+      console.log(err)
+      this.ctx.helper.error(200, 10404, '文章删除失败!') 
     }
   }
 }

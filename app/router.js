@@ -67,6 +67,10 @@ module.exports = app => {
   router.get("/article/articleList", isLogin, controller.article.articleList)
   //获取具体标签文章列表
   router.get("/article/articleInLabel", isLogin, controller.article.articleInLabel)
+  //文章点赞
+  router.post("/article/adcArticleLike", isLogin, controller.article.adcArticleLike)
+  //获取点赞相关用户信息
+  router.get("/article/articleLike", isLogin, controller.article.getLikeUser)
   // 文章修改回显
   router.post("/article/getArticle", isLogin, controller.article.getArticle)
   // 删除文章

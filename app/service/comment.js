@@ -3,8 +3,9 @@ const Service = require('egg').Service;
 class CommentService extends Service {
   //发表评论
   async addComment(options) {
+    const transaction = await this.ctx.model.transaction()
     try {
-      await this.ctx.model.Comment.create(options);
+      await this.ctx.model.Comment.create(options, { transaction });
       const articleResult = await this.ctx.model.Article.findById(options.article_id);
       if (articleResult) {
         articleResult.comment_num += 1;
@@ -16,8 +17,10 @@ class CommentService extends Service {
             where: {
               id: options.article_id,
             },
-          }
+          },
+          { transaction }
         );
+        await transaction.commit();
         this.ctx.body = {
           code: 200,
           message: '评论成功',
@@ -26,6 +29,7 @@ class CommentService extends Service {
         this.ctx.helper.error(200, 10204, '评论失败');
       }
     } catch (err) {
+      await transaction.rollback()
       console.log(err);
       this.ctx.helper.error(200, 10404, '评论失败');
     }
@@ -33,8 +37,9 @@ class CommentService extends Service {
 
   //回复评论
   async replyComment(options) {
+    const transaction = await this.ctx.model.transaction()
     try {
-      await this.ctx.model.Reply.create(options);
+      await this.ctx.model.Reply.create(options, {transaction});
       const commentResult = await this.ctx.model.Comment.findById(options.comment_id);
       if (commentResult) {
         const articleResult = await this.ctx.model.Article.findById(commentResult.article_id);
@@ -48,8 +53,10 @@ class CommentService extends Service {
               where: {
                 id: articleResult.id,
               },
-            }
+            },
+            {transaction}
           );
+          await transaction.commit()
           this.ctx.body = {
             code: 200,
             message: '回复评论成功',
@@ -61,6 +68,7 @@ class CommentService extends Service {
         this.ctx.helper.error(200, 10204, '回复评论失败');
       }
     } catch (err) {
+      await transaction.rollback()
       console.log(err);
       this.ctx.helper.error(200, 10404, '回复评论失败');
     }
@@ -116,10 +124,10 @@ class CommentService extends Service {
     }
   }
 
-  //某篇文章的评论列表(文章第一层评论附带5条reply)
+  //某篇文章的评论列表(文章第一层评论附带3条reply)
   async getSingleArticleCommentList(options) {
     try {
-      const { currentPage, pageSize, article_id } = options;
+      const { currentPage, pageSize, child_currentPage, child_pageSize, article_id } = options;
       const result = await this.ctx.model.Comment.findAndCountAll({
         limit: parseInt(pageSize),
         offset: parseInt(pageSize) * (parseInt(currentPage) - 1),
@@ -133,8 +141,8 @@ class CommentService extends Service {
         result.rows[i].dataValues.commenter = resUser.name;
         result.rows[i].dataValues.commenter_avatar = resUser.avatar
         const resReply = await this.ctx.model.Reply.findAndCountAll({
-          limit: 5,
-          offset: 0,
+          limit: parseInt(child_pageSize),
+          offset: parseInt(child_pageSize) * (parseInt(child_currentPage) - 1),
           order: [['created_at']],
           where: {
             to_user_id: result.rows[i].commenter_id,
@@ -172,12 +180,11 @@ class CommentService extends Service {
   //文章评论中对一个评论的回复讨论列表
   async getCommentReplyList(options) {
     try {
-      //搜索底5个reply之后的数据
       const { currentPage, pageSize, comment_id } = options;
       const result = await this.ctx.model.Reply.findAndCountAll({
         limit: parseInt(pageSize),
         offset: parseInt(pageSize) * (parseInt(currentPage) - 1),
-        order: [['created_at', 'DESC']], //按时间顺序返回，DESC按最新
+        order: [['created_at']],
         where: {
           comment_id: comment_id,
         },
@@ -189,6 +196,7 @@ class CommentService extends Service {
           result.rows[i].to_reply_user_id
         );
         result.rows[i].dataValues.from_author = resFromUser.name;
+        result.rows[i].dataValues.from_author_avatar = resFromUser.avatar;
         result.rows[i].dataValues.to_author = resToUser.name;
         if (resToReplyUser) {
           result.rows[i].dataValues.to_reply_author = resToReplyUser.name;

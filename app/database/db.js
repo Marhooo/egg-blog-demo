@@ -21,23 +21,15 @@ function defineModel (app, name, attributes) {
     }
   }
 
-  attrs.id = {
-    type: UUID,
-    primaryKey: true,
-    defaultValue: () => {
-      return generateUUID()
-    },
+  if(!attributes.id) {
+    attrs.id = {
+      type: UUID,
+      primaryKey: true,
+      defaultValue: () => {
+        return generateUUID()
+      },
+    }
   }
-
-  // attrs.createdAt = {
-  //   type: app.Sequelize.DATE, 
-  //   field: 'created_at',
-  // }
-
-  // attrs.updatedAt = {
-  //   type: app.Sequelize.DATE, 
-  //   field: 'updated_at',
-  // }  
 
   return app.model.define(name, attrs, {
     // 如果需要sequelize帮你维护createdAt,updatedAt和deletedAt必须先启用timestamps功能
