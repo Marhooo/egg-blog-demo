@@ -5,7 +5,7 @@ class CommentService extends Service {
   async addComment(options) {
     const transaction = await this.ctx.model.transaction()
     try {
-      await this.ctx.model.Comment.create(options, { transaction });
+      await this.ctx.model.Comment.create(options, {transaction});
       const articleResult = await this.ctx.model.Article.findById(options.article_id);
       if (articleResult) {
         articleResult.comment_num += 1;
@@ -18,7 +18,7 @@ class CommentService extends Service {
               id: options.article_id,
             },
           },
-          { transaction }
+          {transaction}
         );
         await transaction.commit();
         this.ctx.body = {

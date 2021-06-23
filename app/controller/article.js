@@ -43,8 +43,8 @@ class ArticleController extends Controller {
 
   //文章点赞或取消点赞
   async adcArticleLike() {
-    //成熟了需要把user_id设置为session.id
     const options = this.ctx.request.body
+    options.user_id = this.ctx.session.user.id;
     await this.ctx.service.article.adcArticleLike(options)
   }
 

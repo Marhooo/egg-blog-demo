@@ -1,7 +1,7 @@
 const db = require("../database/db.js");
 
 module.exports = (app) => {
-  const { STRING, INTEGER, TEXT } = app.Sequelize;
+  const { STRING, INTEGER, TEXT, UUID } = app.Sequelize;
 
   const Comment = db.defineModel(app, "comments", {
     content: { type: TEXT("long"), allowNull: false }, // 评论内容
@@ -10,8 +10,8 @@ module.exports = (app) => {
       allowNull: false,
     }, // 作者id  
     article_id: {
-      type: STRING,
-      allowNull: false,
+      type: UUID,
+      allowNull: false  
     }, // 文章id
     commenter_id: {
       type: STRING,
@@ -22,6 +22,11 @@ module.exports = (app) => {
       defaultValue: 0,
     }, //  点赞数
   });
+
+  //--------------------------------------->
+  Comment.associate = () => {
+    Comment.belongsTo(app.model.Article);
+  }
 
   return Comment;
 };

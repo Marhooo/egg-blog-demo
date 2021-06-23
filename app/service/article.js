@@ -76,9 +76,11 @@ class articleService extends Service {
 
   //文章点赞或取消点赞
   async adcArticleLike(options) {
+    const transaction = await this.ctx.model.transaction()
     const Op = this.app.Sequelize.Op;
     try {
       const {article_id, user_id} = options
+      const resart = await this.ctx.model.Article.findById(article_id)
       const result = await this.ctx.model.ArticleUserLikes.findOne({
         where: {
           [Op.and]: [
@@ -92,19 +94,44 @@ class articleService extends Service {
           where: {
             id: result.id
           }
-        })
+        }, {transaction})
+        await this.ctx.model.Article.update(
+          {
+            praise_num: resart.praise_num -=1
+          },
+          {
+            where: {
+              id: article_id
+            }            
+          },
+          { transaction }
+        )
+        await transaction.commit()
         this.ctx.body = {
           code: 200,
           message: '取消点赞成功',
         };
       } else {
-        await this.ctx.model.ArticleUserLikes.create(options)
+        await this.ctx.model.ArticleUserLikes.create(options, { transaction })
+        await this.ctx.model.Article.update(
+          {
+            praise_num: resart.praise_num +=1
+          },
+          {
+            where: {
+              id: article_id
+            }            
+          },
+          { transaction }
+        )
+        await transaction.commit()        
         this.ctx.body = {
           code: 200,
           message: '点赞成功',
         };
       }      
     } catch(err) {
+      await transaction.rollback()
       console.log(err)
       this.ctx.helper.error(200, 10404, '点赞失败')
     }
@@ -117,21 +144,22 @@ class articleService extends Service {
       // const result = await this.ctx.model.ArticleUserLikes.findAll({
       //   include: {
       //     model: this.app.model.SystemUser,
-      //     as: 'Instruments',
       //     where: {
       //       user_id: options.id
       //     }
       //   }
       // })
       const result = await this.app.model.query(
-        //'SELECT `like`.`user_id`, `like`.`id`, `Instruments`.`name` AS `Instruments.name`, `Instruments`.`avatar` AS `Instruments.avatar` FROM `articleuserlikes` AS `like` INNER JOIN `system_users` AS `Instruments` ON `like`.`user_id` = `Instruments`.`id` AND `like`.`article_id` = :article_id',
         'SELECT `articleuserlikes`.`user_id`, `articleuserlikes`.`id`, `system_users`.`name`, `system_users`.`avatar` FROM articleuserlikes INNER JOIN system_users ON `articleuserlikes`.`user_id` = `system_users`.`id` AND `articleuserlikes`.`article_id` = :article_id',
         {
           replacements: { article_id: options.id },
           type: this.app.Sequelize.QueryTypes.SELECT
         }
       )
-      this.ctx.body = result
+      this.ctx.body = {
+        code: 200,
+        data: result
+      }
     } catch(err) {
       console.log(err)
       this.ctx.helper.error(200, 10404, '查询失败!')

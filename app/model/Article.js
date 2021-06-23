@@ -32,9 +32,13 @@ module.exports = app => {
     banner: STRING, // banner图
   })
 
-  // Article.associate = () => {
-  //   Article.belongsToMany(app.model.User, { through: 'articleuserlikes', foreignKey: 'article_id'});
-  // };
+  //--------------------------------------->
+  Article.associate = () => {
+    Article.hasMany(app.model.Comment, {
+      foreignKey: 'article_id',
+    });
+    Article.belongsToMany(app.model.SystemUser, { through: app.model.ArticleUserLikes, foreignKey: 'article_id'})
+  }
 
-  return Article
+  return Article  
 }

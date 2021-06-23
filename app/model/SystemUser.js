@@ -24,9 +24,10 @@ module.exports = app =>{
         session_key: STRING, // 微信session_key
     })
 
-    // User.associate = () => {
-    //   User.belongsToMany(app.model.Article, { through: 'articleuserlikes', foreignKey: 'user_id'});
-    // };    
+    //--------------------------------------->
+    User.associate = () => {
+      User.belongsToMany(app.model.Article, { through: app.model.ArticleUserLikes, foreignKey: 'user_id'});
+    };
 
     return User
 }
