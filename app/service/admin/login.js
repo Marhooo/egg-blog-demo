@@ -31,7 +31,7 @@ class LoginService extends Service{
     }).then(async res => {
       console.log(res)
       if (res) {
-        const roleInfo = await ctx.model.SystemRole.findById(res.role_id)
+        const roleInfo = await ctx.model.SystemRole.findByPk(res.role_id)
         res.setDataValue("roleName", roleInfo.name)
         await ctx.model.SystemRolePermission.findOne({
           where: { role_id: res.role_id },
@@ -52,7 +52,7 @@ class LoginService extends Service{
 
   // 查询用户信息
   async getUserInfoId (uid) {
-    return await this.app.model.SystemUser.findById(uid)
+    return await this.app.model.SystemUser.findByPk(uid)
   }
 
 

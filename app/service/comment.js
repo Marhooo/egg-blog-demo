@@ -5,8 +5,8 @@ class CommentService extends Service {
   async addComment(options) {
     const transaction = await this.ctx.model.transaction()
     try {
-      await this.ctx.model.Comment.create(options, {transaction});
-      const articleResult = await this.ctx.model.Article.findById(options.article_id);
+      await this.ctx.model.Comment.create(options, transaction);
+      const articleResult = await this.ctx.model.Article.findByPk(options.article_id);
       if (articleResult) {
         articleResult.comment_num += 1;
         await this.ctx.model.Article.update(
@@ -17,8 +17,8 @@ class CommentService extends Service {
             where: {
               id: options.article_id,
             },
+            transaction
           },
-          {transaction}
         );
         await transaction.commit();
         this.ctx.body = {
@@ -39,10 +39,10 @@ class CommentService extends Service {
   async replyComment(options) {
     const transaction = await this.ctx.model.transaction()
     try {
-      await this.ctx.model.Reply.create(options, {transaction});
-      const commentResult = await this.ctx.model.Comment.findById(options.comment_id);
+      await this.ctx.model.Reply.create(options, transaction);
+      const commentResult = await this.ctx.model.Comment.findByPk(options.comment_id);
       if (commentResult) {
-        const articleResult = await this.ctx.model.Article.findById(commentResult.article_id);
+        const articleResult = await this.ctx.model.Article.findByPk(commentResult.article_id);
         if (articleResult) {
           articleResult.comment_num += 1;
           await this.ctx.model.Article.update(
@@ -53,8 +53,8 @@ class CommentService extends Service {
               where: {
                 id: articleResult.id,
               },
-            },
-            {transaction}
+              transaction
+            }
           );
           await transaction.commit()
           this.ctx.body = {
@@ -89,8 +89,8 @@ class CommentService extends Service {
         const comment = res.rows[i];
         //console.log(comment.toJSON());
         //console.log({haha: comment})
-        const user = await this.ctx.model.SystemUser.findById(comment.author_id);
-        const article = await this.ctx.model.Article.findById(comment.article_id);
+        const user = await this.ctx.model.SystemUser.findByPk(comment.author_id);
+        const article = await this.ctx.model.Article.findByPk(comment.article_id);
         //console.log(user)
         results.rows.push({
           ...comment.toJSON(),
@@ -103,8 +103,8 @@ class CommentService extends Service {
       // let article = [];
       // for(let i=0; i < res.rows.length; i++){
       //   const comment = res.rows[i];
-      //   user.push(await this.ctx.model.SystemUser.findById(comment.author_id));
-      //   article.push(await this.ctx.model.Article.findById(comment.article_id));
+      //   user.push(await this.ctx.model.SystemUser.findByPk(comment.author_id));
+      //   article.push(await this.ctx.model.Article.findByPk(comment.article_id));
       // }
       // results = res.rows.map((x, i)=>{
       //   return{
@@ -137,7 +137,7 @@ class CommentService extends Service {
         },
       });
       for (let i = 0; i < result.rows.length; i++) {
-        const resUser = await this.ctx.model.SystemUser.findById(result.rows[i].commenter_id);
+        const resUser = await this.ctx.model.SystemUser.findByPk(result.rows[i].commenter_id);
         result.rows[i].dataValues.commenter = resUser.name;
         result.rows[i].dataValues.commenter_avatar = resUser.avatar
         const resReply = await this.ctx.model.Reply.findAndCountAll({
@@ -151,9 +151,9 @@ class CommentService extends Service {
         });
         if (resReply) {
           for (let j = 0; j < resReply.rows.length; j++) {
-            const resFromUser = await this.ctx.model.SystemUser.findById(resReply.rows[j].from_user_id);
-            const resToUser = await this.ctx.model.SystemUser.findById(resReply.rows[j].to_user_id);
-            const resToReplyUser = await this.ctx.model.SystemUser.findById(
+            const resFromUser = await this.ctx.model.SystemUser.findByPk(resReply.rows[j].from_user_id);
+            const resToUser = await this.ctx.model.SystemUser.findByPk(resReply.rows[j].to_user_id);
+            const resToReplyUser = await this.ctx.model.SystemUser.findByPk(
               resReply.rows[j].to_reply_user_id
             );
             resReply.rows[j].dataValues.from_author = resFromUser.name;
@@ -190,9 +190,9 @@ class CommentService extends Service {
         },
       });
       for (let i = 0; i < result.rows.length; i++) {
-        const resFromUser = await this.ctx.model.SystemUser.findById(result.rows[i].from_user_id);
-        const resToUser = await this.ctx.model.SystemUser.findById(result.rows[i].to_user_id);
-        const resToReplyUser = await this.ctx.model.SystemUser.findById(
+        const resFromUser = await this.ctx.model.SystemUser.findByPk(result.rows[i].from_user_id);
+        const resToUser = await this.ctx.model.SystemUser.findByPk(result.rows[i].to_user_id);
+        const resToReplyUser = await this.ctx.model.SystemUser.findByPk(
           result.rows[i].to_reply_user_id
         );
         result.rows[i].dataValues.from_author = resFromUser.name;

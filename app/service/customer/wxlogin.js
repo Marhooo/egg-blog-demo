@@ -78,7 +78,7 @@ class WxLoginService extends Service {
               },
             }
           );
-          const role = await this.ctx.model.SystemRole.findById(user.role_id);
+          const role = await this.ctx.model.SystemRole.findByPk(user.role_id);
           if (!role.status) {
             this.ctx.helper.error(200, 10020, '该账号所在角色已被禁用,请联系管理员');
           } else if (!user.status || user.status == '0') {

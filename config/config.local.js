@@ -13,5 +13,11 @@ exports.sequelize = {
     // 数据库名
     database: "egg_server",
     //东八时区
-    timezone: '+08:00'
+    timezone: '+08:00',
+    //连接池设置
+    pool: {   
+        max: 3, //最大连接数
+        min: 0, //最小连接数
+        idle: 10000
+    },    
 };

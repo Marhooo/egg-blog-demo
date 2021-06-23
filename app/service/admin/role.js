@@ -28,7 +28,7 @@ class RoleService extends Service {
     let results = {};
 
     if (id) {
-      await ctx.model.SystemRole.findById(id).then(async (res) => {
+      await ctx.model.SystemRole.findByPk(id).then(async (res) => {
         if (res.name === "超级管理员") {
           results = {
             code: 10000,
@@ -108,7 +108,7 @@ class RoleService extends Service {
   async delRole (rid) {
     let results = {}
     const { ctx } = this
-    await ctx.model.SystemRole.findById(rid).then(async res => {
+    await ctx.model.SystemRole.findByPk(rid).then(async res => {
       if (res.name === "超级管理员") {
         results = {
           code: 10000,

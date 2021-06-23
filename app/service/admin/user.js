@@ -79,8 +79,8 @@ class UserService extends Service{
   async delUser (uid) {
     let results = ""
     const { ctx } = this
-    await ctx.model.SystemUser.findById(uid).then(async sueRes => {
-      await ctx.model.SystemRole.findById(sueRes.role_id).then(async roleRes => {
+    await ctx.model.SystemUser.findByPk(uid).then(async sueRes => {
+      await ctx.model.SystemRole.findByPk(sueRes.role_id).then(async roleRes => {
         if (roleRes.name === "超级管理员") {
           results = {
             code: 10000,

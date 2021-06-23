@@ -16,7 +16,7 @@ class LoginController extends Controller {
       };
     } else {
       const newPass = await cryptoMd5(password, keys);
-      await this.ctx.model.SystemRole.findById(user.role_id).then(
+      await this.ctx.model.SystemRole.findByPk(user.role_id).then(
         async (res) => {
           roleStatus = res.status;
         }

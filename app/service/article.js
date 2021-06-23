@@ -33,11 +33,11 @@ class articleService extends Service {
       });
       //灰色部分代码有问题的根本原因是使用 promise 或 async 函数作为 forEach() 等类似方法的 callback 参数，导致队列接不到回执。
       // result.rows.forEach(async element => {
-      //   const resUser = await this.ctx.model.SystemUser.findById(element.author)
+      //   const resUser = await this.ctx.model.SystemUser.findByPk(element.author)
       //   element.author = resUser.name
       // });
       for (let i = 0; i < result.rows.length; i++) {
-        const resUser = await this.ctx.model.SystemUser.findById(result.rows[i].author);
+        const resUser = await this.ctx.model.SystemUser.findByPk(result.rows[i].author);
         result.rows[i].dataValues.author_name = resUser.name;
       }
       this.ctx.body = {
@@ -80,7 +80,7 @@ class articleService extends Service {
     const Op = this.app.Sequelize.Op;
     try {
       const {article_id, user_id} = options
-      const resart = await this.ctx.model.Article.findById(article_id)
+      const resart = await this.ctx.model.Article.findByPk(article_id)
       const result = await this.ctx.model.ArticleUserLikes.findOne({
         where: {
           [Op.and]: [
@@ -93,18 +93,20 @@ class articleService extends Service {
         await this.ctx.model.ArticleUserLikes.destroy({
           where: {
             id: result.id
-          }
-        }, {transaction})
+          },
+          transaction
+        })
+        const num = resart.praise_num - 1
         await this.ctx.model.Article.update(
           {
-            praise_num: resart.praise_num -=1
+            praise_num: num
           },
           {
             where: {
               id: article_id
-            }            
-          },
-          { transaction }
+            },
+            transaction            
+          }
         )
         await transaction.commit()
         this.ctx.body = {
@@ -112,7 +114,7 @@ class articleService extends Service {
           message: '取消点赞成功',
         };
       } else {
-        await this.ctx.model.ArticleUserLikes.create(options, { transaction })
+        await this.ctx.model.ArticleUserLikes.create(options, transaction)
         await this.ctx.model.Article.update(
           {
             praise_num: resart.praise_num +=1
@@ -120,9 +122,9 @@ class articleService extends Service {
           {
             where: {
               id: article_id
-            }            
-          },
-          { transaction }
+            },
+            transaction            
+          }
         )
         await transaction.commit()        
         this.ctx.body = {
@@ -169,7 +171,7 @@ class articleService extends Service {
   //文章回显
   async getArticle(aId) {
     try {
-      const articleresult = await this.ctx.model.Article.findById(aId);
+      const articleresult = await this.ctx.model.Article.findByPk(aId);
       if (articleresult) {
         articleresult.read_num += 1;
         await this.ctx.model.Article.update(
