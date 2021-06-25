@@ -23,28 +23,28 @@ module.exports = appInfo => {
   // add your middleware config here
   config.middleware = [];
 
-  // add your user config here
-  const userConfig = {
-    // myAppName: 'egg',
-  };
-
   config.jwt = {
     secret: "595485548",
     enable: false,
   };
 
-  // config.cors = {
-  //   origin: '*', // 匹配规则  域名+端口  *则为全匹配
-  //   allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
-  //   credentials: true
-  // };
-
   config.cors = {
-    origin: ctx => ctx.get('origin'),
+    origin: ctx => ctx.get('origin'),      //匹配规则  域名+端口  *则为全匹配
     allowMethods: 'GET,HEAD,POST,PATCH',
     credentials: true
   };
 
+  // add your user config here
+  const userConfig = {
+    // myAppName: 'egg',
+  };
+
+  userConfig.wechat = {
+    appid: 'wxabd15cdb355480a5',
+    mchid: 1526312241,
+    serial_no: "1A2CEAD5617A2E017132CCA4AAAC10C1FA265703"
+  }
+  
   return {
     ...config,
     ...userConfig,

@@ -77,6 +77,8 @@ module.exports = app => {
   router.post("/article/delArticle", isLogin, controller.article.delArticle)
   // 图片上传
   router.post("/editor/uploadImg", controller.article.uploadImg)
+  //文件下载
+  router.get("/flie/downloadFile", controller.article.downloadFile)
   // 发表评论
   router.post("/comment/addComment", isLogin, controller.comment.addComment)
   // 回复评论

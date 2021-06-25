@@ -156,4 +156,12 @@ module.exports = {
     return imgUrl
   },
 
+  //下载文件
+  async download() {
+    const filePath = path.join(this.config.baseDir, 'app/public/download/lost.zip');
+    this.ctx.attachment('失落大陆LostContinent.zip');
+    this.ctx.set('Content-Type', 'application/octet-stream');
+    this.ctx.body = fs.createReadStream(filePath);
+  }
+
 };
