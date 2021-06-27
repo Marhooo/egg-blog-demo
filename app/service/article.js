@@ -52,6 +52,7 @@ class articleService extends Service {
 
   //查询具体标签文章列表
   async getArticleInLabel(options) {
+    const Op = this.app.Sequelize.Op;
     try {
       const { currentPage, pageSize, article_label } = options;
       const result = await this.ctx.model.Article.findAndCountAll({
@@ -59,7 +60,7 @@ class articleService extends Service {
         offset: parseInt(pageSize) * (parseInt(currentPage) - 1),
         where: {
           article_label: {
-            like: `%${article_label}%`,
+            [Op.like]: `%${article_label}%`,
           },
         },
       });
@@ -114,7 +115,7 @@ class articleService extends Service {
           message: '取消点赞成功',
         };
       } else {
-        await this.ctx.model.ArticleUserLikes.create(options, transaction)
+        await this.ctx.model.ArticleUserLikes.create(options, {transaction})
         await this.ctx.model.Article.update(
           {
             praise_num: resart.praise_num +=1

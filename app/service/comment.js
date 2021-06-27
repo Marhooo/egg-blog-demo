@@ -5,7 +5,7 @@ class CommentService extends Service {
   async addComment(options) {
     const transaction = await this.ctx.model.transaction()
     try {
-      await this.ctx.model.Comment.create(options, transaction);
+      await this.ctx.model.Comment.create(options, {transaction});
       const articleResult = await this.ctx.model.Article.findByPk(options.article_id);
       if (articleResult) {
         articleResult.comment_num += 1;
@@ -39,7 +39,7 @@ class CommentService extends Service {
   async replyComment(options) {
     const transaction = await this.ctx.model.transaction()
     try {
-      await this.ctx.model.Reply.create(options, transaction);
+      await this.ctx.model.Reply.create(options, {transaction});
       const commentResult = await this.ctx.model.Comment.findByPk(options.comment_id);
       if (commentResult) {
         const articleResult = await this.ctx.model.Article.findByPk(commentResult.article_id);

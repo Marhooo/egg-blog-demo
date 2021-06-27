@@ -4,6 +4,7 @@ const fs = require("fs");
 const dayjs = require("dayjs");
 const sendToWormhole = require("stream-wormhole")
 const awaitStreamReady = require("await-stream-ready").write
+const util = require("util")
 
 module.exports = {
   //微信APIv3密钥解密微信平台证书加密公钥函数，解密出来的公钥放入'app/ca'
@@ -157,10 +158,12 @@ module.exports = {
   },
 
   //下载文件
-  async download() {
-    const filePath = path.join(this.config.baseDir, 'app/public/download/lost.zip');
-    this.ctx.attachment('失落大陆LostContinent.zip');
+  async download(fp, name) {
+    const filePath = path.join(this.config.baseDir, fp);
+    this.ctx.attachment(name);
+    const fileSize = (await util.promisify(fs.stat)(filePath)).size; //异步读取文件大小
     this.ctx.set('Content-Type', 'application/octet-stream');
+    this.ctx.set('Content-Length', fileSize);
     this.ctx.body = fs.createReadStream(filePath);
   }
 

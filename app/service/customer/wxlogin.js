@@ -52,7 +52,7 @@ class WxLoginService extends Service {
               'hours'
             );
             const uid = checkUser.id;
-            await this.ctx.service.customer.wxlogin.saveToken({
+            await this.ctx.model.SystemToken.upsert({
               uid,
               access_token,
               refresh_token,
@@ -87,7 +87,7 @@ class WxLoginService extends Service {
             const refresh_token = await this.ctx.helper.createToken({ id: user.id }, '7', 'days');
             const access_token = await this.ctx.helper.createToken({ id: user.id }, '2', 'hours');
             const uid = user.id;
-            await this.ctx.service.customer.wxlogin.saveToken({
+            await this.ctx.model.SystemToken.upsert({
               uid,
               access_token,
               refresh_token,
@@ -114,11 +114,6 @@ class WxLoginService extends Service {
     return user;
   }
 
-  // 生成 token 保存数据库
-  async saveToken(data) {
-    await this.app.model.SystemToken.upsert(data);
-  }
-
   //测试微信登录接口
   async wxLogin(options) {
     try {
@@ -130,7 +125,7 @@ class WxLoginService extends Service {
         const refresh_token = await this.ctx.helper.createToken({ id: user.id }, '7', 'days');
         const access_token = await this.ctx.helper.createToken({ id: user.id }, '2', 'hours');
         const uid = user.id;
-        await this.ctx.service.customer.wxlogin.saveToken({
+        await this.ctx.model.SystemToken.upsert({
           uid,
           access_token,
           refresh_token,

@@ -4,10 +4,10 @@ class PayMentService extends Service {
   //生成支付订单
   async addPayOrder(options) {
     try {
-      options.user_id = this.ctx.session.user.id
+      options.user_id = this.ctx.session.user.id;
       options.payer_id = this.ctx.session.user.openid;
-      options.appid = this.app.config.wechat.appid
-      options.mchid = this.app.config.wechat.mchid
+      options.appid = this.app.config.wechat.appid;
+      options.mchid = this.app.config.wechat.mchid;
       options.time_expire = Math.round(new Date().getTime() / 1000) + 15 * 60;
       //const { product_description, pay_total, original_price, payer_client_ip} = options
       const result = await this.ctx.model.Order.create(options);
@@ -17,17 +17,19 @@ class PayMentService extends Service {
           currency: result.currency,
           order_id: result.id,
           product_description: result.product_description,
-          pay_total: result.pay_total          
-        }
+          pay_total: result.pay_total,
+        },
       };
     } catch (err) {
       console.log(err);
       this.ctx.helper.error(200, 10404, '支付订单创建失败');
     }
   }
+
   //统一微信小程序下单拿prepay_id 且关闭已超时订单
   async getPayWechatMini(options) {
-    const transaction = await this.ctx.model.transaction()
+    const Op = this.app.Sequelize.Op;
+    const transaction = await this.ctx.model.transaction();
     try {
       const { product_description, pay_total, currency, order_id } = options;
       //下单前先查询当前用户在数据库中的订单状态为未支付，且已过时的订单，进行关单操作
@@ -61,7 +63,12 @@ class PayMentService extends Service {
               Authorization: `WECHATPAY2-SHA256-RSA2048 mchid="${this.app.config.wechat.mchid}",nonce_str="${nonceStr}",signature="${cryptoRsa}",timestamp="${timep}",serial_no="${this.app.config.wechat.serial_no}"`,
             },
           });
-          if(closed.status == 204 || closed.status == 400 || closed.status == 404 || closed.status == 403) {
+          if (
+            closed.status == 204 ||
+            closed.status == 400 ||
+            closed.status == 404 ||
+            closed.status == 403
+          ) {
             await this.ctx.model.Order.upsert({
               pay_status: '0',
               id: shouldBeClosed[i].id,
@@ -104,22 +111,70 @@ class PayMentService extends Service {
         },
       });
       const paySign_message =
-      this.app.config.wechat.appid + '\n' + timep + '\n' + nonceStr + '\n' + `prepay_id=${res.data.prepay_id}` + '\n';
+        this.app.config.wechat.appid +
+        '\n' +
+        timep +
+        '\n' +
+        nonceStr +
+        '\n' +
+        `prepay_id=${res.data.prepay_id}` +
+        '\n';
       const paySign = this.ctx.helper.wechatPaySignCrypto(paySign_message);
       console.log(res);
       if (res.status == 200 && res.data.prepay_id) {
-        await this.ctx.model.Order.upsert({
-          id: order_id,
-          prepay_id: res.data.prepay_id,
-        }, transaction);
-        await this.ctx.model.PayRequestArgs.create({
-          package: `prepay_id=${res.data.prepay_id}`,
-          pay_order: order_id,
-          time_stamp: timep,
-          noncestr: nonceStr,
-          signtype: 'RSA',
-          pay_sign: paySign,
-        }, transaction);
+        await this.ctx.model.Order.upsert(
+          {
+            id: order_id,
+            prepay_id: res.data.prepay_id,
+          },
+          {transaction}
+        );
+        await this.ctx.model.PayRequestArgs.create(
+          {
+            package: `prepay_id=${res.data.prepay_id}`,
+            pay_order: order_id,
+            time_stamp: timep,
+            noncestr: nonceStr,
+            signtype: 'RSA',
+            pay_sign: paySign,
+          },
+          {transaction}
+        );
+        if (options.pay_for === '1' && options.aide_type == undefined) {
+          //失落大陆辅助购买下单的单独情况,配合addGameRawData
+          await this.ctx.model.GameMonitor.create(
+            {
+              user_id: this.ctx.session.user.id,
+              open_id: this.ctx.session.user.openid,
+              pay_order: order_id,
+            },
+            {transaction}
+          );
+          await this.ctx.model.Order.update(
+            { pay_status: '0' },
+            {
+              where: {
+                [Op.and]: [
+                  { pay_for: '1' },
+                  { user_id: this.ctx.session.user.id },
+                  { pay_status: '1' },
+                  { id: { [Op.ne]: order_id } },
+                ],
+              },
+              transaction,
+            }
+          );
+          await this.ctx.model.GameMonitor.destroy({
+            where: {
+              [Op.and]: [
+                { has_besend: false },
+                { pay_order: { [Op.ne]: order_id } },
+                { user_id: this.ctx.session.user.id },
+              ],
+            },
+            transaction,
+          });
+        }
         await transaction.commit();
         this.ctx.body = {
           code: 200,
@@ -133,20 +188,20 @@ class PayMentService extends Service {
           },
         };
       } else if (res.status == 400) {
-        await transaction.rollback()
+        await transaction.rollback();
         this.ctx.body = {
           code: 10030,
           message: res.data.message,
-        };          
+        };
       } else {
-        await transaction.rollback()
+        await transaction.rollback();
         this.ctx.body = {
           code: 10404,
           message: '预支付交易标识官方接口出错',
         };
       }
     } catch (err) {
-      await transaction.rollback()
+      await transaction.rollback();
       console.log(err);
       this.ctx.helper.error(200, 10404, '预支付交易标识获取失败');
     }
@@ -173,7 +228,7 @@ class PayMentService extends Service {
         },
       });
       if (res.status === 200) {
-        if(res.data.trade_state === 'SUCCESS') {
+        if (res.data.trade_state === 'SUCCESS') {
           await this.ctx.model.Order.upsert({
             pay_status: '2',
             id: out_trade_no,
@@ -181,7 +236,7 @@ class PayMentService extends Service {
           this.ctx.body = {
             code: 200,
             message: '支付成功!',
-          };          
+          };
         }
         this.ctx.body = {
           code: 200,

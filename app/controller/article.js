@@ -74,10 +74,6 @@ class ArticleController extends Controller {
     this.ctx.body = { errno: 0, data: [imgurl] };
   }
 
-  //文件下载
-  async downloadFile() {
-    await this.ctx.helper.download()
-  }
 }
 
 module.exports = ArticleController;

@@ -77,8 +77,6 @@ module.exports = app => {
   router.post("/article/delArticle", isLogin, controller.article.delArticle)
   // 图片上传
   router.post("/editor/uploadImg", controller.article.uploadImg)
-  //文件下载
-  router.get("/flie/downloadFile", controller.article.downloadFile)
   // 发表评论
   router.post("/comment/addComment", isLogin, controller.comment.addComment)
   // 回复评论
@@ -102,4 +100,9 @@ module.exports = app => {
   router.get("/payment/inquirePayWechatMini", isLogin, controller.customer.payment.inquirePayWechatMini)
   //查询微信支付订单列表
   router.post("/payment/inquirePayList", isLogin, controller.customer.payment.inquirePayList)
+
+  /**************************************************************** */
+
+  //游戏文件下载
+  router.get("/flie/downloadFile", controller.gamemonitor.downloadGameFile)
 };
