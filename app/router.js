@@ -105,4 +105,6 @@ module.exports = app => {
 
   //游戏文件下载
   router.get("/flie/downloadFile", controller.gamemonitor.downloadGameFile)
+  //添加IMEI返回激活码
+  router.post("/gamemonitoe/addGameRawData", isLogin, controller.gamemonitor.addGameRawData)
 };

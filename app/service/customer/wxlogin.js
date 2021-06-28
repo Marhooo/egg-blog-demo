@@ -5,21 +5,18 @@ class WxLoginService extends Service {
   async wxRegisterLogin(options) {
     try {
       const { js_code, userInfo } = options;
-      const wx = {
-        appId: 'wxabd15cdb355480a5',
-        appSecret: '95ecc98b57fd8551e24fc3056156b0e4',
-      };
       const url =
         'https://api.weixin.qq.com/sns/jscode2session?appid=' +
-        wx.appId +
+        this.app.config.wechat.appid +
         '&secret=' +
-        wx.appSecret +
+        this.app.config.wechat.appSecret +
         '&js_code=' +
         js_code +
         '&grant_type=authorization_code';
       const resOidAndSkey = await this.ctx.curl(url, {
         dataType: 'json',
       });
+      //console.log(resOidAndSkey)
       if (resOidAndSkey.data && resOidAndSkey.status === 200) {
         const roleinfo = await this.ctx.model.SystemRole.findOne({
           where: { name: '游客' },

@@ -42,7 +42,8 @@ module.exports = appInfo => {
   userConfig.wechat = {
     appid: 'wxabd15cdb355480a5',
     mchid: 1526312241,
-    serial_no: "1A2CEAD5617A2E017132CCA4AAAC10C1FA265703"
+    serial_no: "1A2CEAD5617A2E017132CCA4AAAC10C1FA265703",
+    appSecret: '95ecc98b57fd8551e24fc3056156b0e4'
   }
   
   return {

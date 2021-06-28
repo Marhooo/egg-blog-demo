@@ -5,8 +5,7 @@ class GameMonitorService extends Service {
   async addGameRawData(options) {
     const Op = this.app.Sequelize.Op;
     try {
-      options.user_id = this.ctx.session.user.id;
-      options.open_id = this.ctx.session.user.openid;
+      options.wechat_name = this.ctx.session.user.name
       options.has_besend = true;
       const result = await this.ctx.model.Order.findAll({
         where: {
@@ -23,7 +22,7 @@ class GameMonitorService extends Service {
           [Op.and]: [{ user_id: this.ctx.session.user.id }, { has_besend: false }],
         },
       });
-      console.log(result);
+      //console.log(result);
       if (result == null && codeInfo) {
         options.verify_code = parseInt(options.imei.slice(-4)) * 2 + 5678;
         await this.ctx.model.GameMonitor.update(options, {

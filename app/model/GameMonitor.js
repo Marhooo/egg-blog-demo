@@ -10,7 +10,7 @@ module.exports = (app) => {
     open_id: UUID, //购买人openid    
     has_besend: { type: BOOLEAN, defaultValue: false }, //是否已经发给客户  
     online: { type: BOOLEAN, defaultValue: false }, //是否在线
-    lock_imei: { type: BOOLEAN, defaultValue: false }, //锁住激活码
+    can_load: { type: BOOLEAN, defaultValue: true }, //是否可用此激活码
     wechat_name: STRING, //购买人微信名
     pay_order: {
       //隶属支付订单id

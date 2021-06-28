@@ -11,12 +11,17 @@ module.exports = (app) => {
     }, // 作者id  
     article_id: {
       type: UUID,
-      allowNull: false  
+      references: {
+        model: 'articles',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
     }, // 文章id
     commenter_id: {
       type: STRING,
       allowNull: false,
-    }, // 评论者id    
+    }, // 评论者id
     praise_num: {
       type: INTEGER,
       defaultValue: 0,
@@ -24,9 +29,6 @@ module.exports = (app) => {
   });
 
   //--------------------------------------->
-  Comment.associate = () => {
-    Comment.belongsTo(app.model.Article);
-  }
 
   return Comment;
 };

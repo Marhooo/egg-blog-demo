@@ -29,7 +29,7 @@ class LoginService extends Service{
     await this.ctx.model.SystemUser.findOne({
       where: { id: info.message.id },
     }).then(async res => {
-      console.log(res)
+      //console.log(res)
       if (res) {
         const roleInfo = await ctx.model.SystemRole.findByPk(res.role_id)
         res.setDataValue("roleName", roleInfo.name)
