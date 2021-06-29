@@ -9,6 +9,7 @@
   "dependencies": {
     "await-stream-ready": "^1.0.1",
     "chalk": "^4.1.0",
+    "crypto-js": "^4.0.0",
     "dayjs": "^1.8.35",
     "egg": "^2.15.1",
     "egg-cors": "^2.2.3",
@@ -16,6 +17,7 @@
     "egg-scripts": "^2.11.0",
     "egg-sequelize": "^4.3.1",
     "egg-validate": "^2.0.2",
+    "js-base64": "^3.6.1",
     "mysql2": "^1.6.4",
     "stream-wormhole": "^1.1.0"
   },
