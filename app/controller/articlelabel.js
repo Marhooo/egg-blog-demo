@@ -12,7 +12,12 @@ class ArticleLabelController extends Controller {
     const options = this.ctx.request.query;
     await this.ctx.service.articlelabel.getArticleLabel(options);
     //把this.ctx.body写在service层，更优雅的去处理错误
-  }  
+  }
+  
+  //获取轮播图标签add_num前四
+  async getBannerLabel() {
+    await this.ctx.service.articlelabel.getBannerLabel();
+  }
 
 }
 

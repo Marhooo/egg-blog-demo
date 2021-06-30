@@ -24,6 +24,12 @@ class GameMonitorController extends Controller {
       this.ctx.helper.error(200, 10404, '未知错误!请联系作者!');
     }
   }
+
+  //远程失落大陆脚本锁
+  async lostVerify() {
+    const options = this.ctx.request.query;
+    await this.ctx.service.gamemonitor.lostVerify(options)
+  }
 }
 
 module.exports = GameMonitorController;

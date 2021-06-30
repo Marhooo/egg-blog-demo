@@ -29,8 +29,8 @@ class PayMentService extends Service {
   //统一微信小程序下单拿prepay_id 且关闭已超时订单
   async getPayWechatMini(options) {
     const Op = this.app.Sequelize.Op;
-    const transaction = await this.ctx.model.transaction();
     try {
+      const transaction = await this.ctx.model.transaction(); 
       const { product_description, pay_total, currency, order_id } = options;
       //下单前先查询当前用户在数据库中的订单状态为未支付，且已过时的订单，进行关单操作
       const shouldBeClosed = await this.ctx.model.Order.findAll({
@@ -109,7 +109,7 @@ class PayMentService extends Service {
           'content-type': 'application/json',
           Authorization: `WECHATPAY2-SHA256-RSA2048 mchid="${this.app.config.wechat.mchid}",nonce_str="${nonceStr}",signature="${cryptoRsa}",timestamp="${timep}",serial_no="${this.app.config.wechat.serial_no}"`,
         },
-      });
+      });     
       const paySign_message =
         this.app.config.wechat.appid +
         '\n' +
@@ -120,7 +120,7 @@ class PayMentService extends Service {
         `prepay_id=${res.data.prepay_id}` +
         '\n';
       const paySign = this.ctx.helper.wechatPaySignCrypto(paySign_message);
-      console.log(res);
+      //console.log(res);
       if (res.status == 200 && res.data.prepay_id) {
         await this.ctx.model.Order.upsert(
           {

@@ -33,9 +33,9 @@ module.exports = app => {
   })
 
   //--------------------------------------->
-  Article.associate = () => {
-    Article.belongsToMany(app.model.SystemUser, { through: app.model.ArticleUserLikes, foreignKey: 'article_id'})
-  }
+  // Article.associate = () => {
+  //   Article.belongsToMany(app.model.SystemUser, { through: app.model.ArticleUserLikes, foreignKey: 'article_id'})
+  // }
 
   return Article  
 }

@@ -18,7 +18,6 @@ class ArticleController extends Controller {
       }
       this.ctx.validate(Rule)
       const articleData = this.ctx.request.body;
-      articleData.article_label = articleData.article_label.join(',');
       articleData.author = this.ctx.session.user.id;
       await this.ctx.service.article.saveOrUpArticle(articleData);
     } catch(err) {
@@ -39,6 +38,18 @@ class ArticleController extends Controller {
   async articleInLabel() {
     const options = this.ctx.request.query;
     await this.ctx.service.article.getArticleInLabel(options)
+  }
+
+  //查询热门文章
+  async articleHot() {
+    const options = this.ctx.request.query;
+    await this.ctx.service.article.getArticleHot(options)
+  }
+
+  //搜你感兴趣的文章
+  async articleInterested() {
+    const options = this.ctx.request.query
+    await this.ctx.service.article.getArticleInterested(options)
   }
 
   //文章点赞或取消点赞

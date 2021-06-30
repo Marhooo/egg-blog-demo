@@ -3,8 +3,8 @@ const Service = require('egg/index').Service;
 class WxLoginService extends Service {
   //微信小程序发来请求有两种情况：1.重新授权用户信息和手机信息后发来的请求。 2.一般微信小程序请求后台登录拿token
   async wxRegisterLogin(options) {
-    const transaction = await this.ctx.model.transaction();
     try {
+      const transaction = await this.ctx.model.transaction();
       const { js_code } = options;
       const url =
         'https://api.weixin.qq.com/sns/jscode2session?appid=' +
@@ -17,17 +17,18 @@ class WxLoginService extends Service {
       const resOidAndSkey = await this.ctx.curl(url, {
         dataType: 'json',
       });
-      if (resOidAndSkey.data && resOidAndSkey.status === 200) {
+      //console.log(resOidAndSkey)     
+      if ( resOidAndSkey.status === 200 && !resOidAndSkey.data.errcode) {
         if(options.userEncryptedData && options.phoneEncryptedData && options.userIv && options.phoneIv) {
           //微信小程序重新授权用户信息和手机信息后发来的请求
           let userInfo = this.ctx.helper.wxUserDecryptData(resOidAndSkey.data.session_key, options.userEncryptedData, options.userIv)
           let userPhoneInfo = this.ctx.helper.wxUserDecryptData(resOidAndSkey.data.session_key, options.phoneEncryptedData, options.phoneIv)
-          // console.log(userPhoneInfo)
-          // console.log(userInfo)
           const roleInfo = await this.ctx.model.SystemRole.findOne({
             where: { name: '游客' },
           });
-          const user = await this.ctx.service.customer.wxlogin.findOpenId(resOidAndSkey.data.openid);
+          const user = await this.ctx.model.SystemUser.findOne({
+            where: { openid: resOidAndSkey.data.openid }
+          });
           if (!user) {
             await this.ctx.model.SystemUser.create({
               username: 'wxlogin',
@@ -42,9 +43,9 @@ class WxLoginService extends Service {
               sex: userInfo.gender == 1 ? '1' : '2',
               mobile_phone: userPhoneInfo.phoneNumber
             }, {transaction});
-            const checkUser = await this.ctx.service.customer.wxlogin.findOpenId(
-              resOidAndSkey.data.openid
-            );
+            const checkUser = await this.ctx.model.SystemUser.findOne({
+              where: { openid: resOidAndSkey.data.openid }
+            });
             if (checkUser) {
               const refresh_token = await this.ctx.helper.createToken(
                 { id: checkUser.id },
@@ -110,9 +111,9 @@ class WxLoginService extends Service {
           }
         } else {
           //微信小程序的平常登录情况
-          const user = await this.ctx.service.customer.wxlogin.findOpenId(
-            resOidAndSkey.data.openid
-          );
+          const user = await this.ctx.model.SystemUser.findOne({
+            where: { openid: resOidAndSkey.data.openid }
+          });
           const role = await this.ctx.model.SystemRole.findByPk(user.role_id);
           if (!role.status) {
             this.ctx.helper.error(200, 10020, '该账号所在角色已被禁用,请联系管理员');
@@ -145,18 +146,13 @@ class WxLoginService extends Service {
     }
   }
 
-  async findOpenId(openid) {
-    const user = await this.ctx.model.SystemUser.findOne({
-      where: { openid },
-    });
-    return user;
-  }
-
   //测试微信登录接口
   async wxLogin(options) {
     try {
       const { openid } = options;
-      const user = await this.ctx.service.customer.wxlogin.findOpenId(openid);
+      const user = await this.ctx.model.SystemUser.findOne({
+        where: { openid: openid }
+      });
       if (!user) {
         this.ctx.helper.error(200, 10204, 'openid用户不存在!');
       } else {

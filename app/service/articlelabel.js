@@ -47,6 +47,23 @@ class ArticleLabelService extends Service {
       this.ctx.helper.error(200, 10404, '查询失败');
     }
   }
+
+  //获取轮播图标签add_num前四
+  async getBannerLabel() {
+    try {
+      const result = await this.ctx.model.ArticleLabel.findAll({
+        order: [['add_num', 'DESC']]
+      })
+      this.ctx.body = {
+        code: 200,
+        data: result.slice(0, 4)
+      }           
+    } catch (err) {
+      console.log(err);
+      this.ctx.helper.error(200, 10404, '查询失败');      
+    }
+
+  }
 }
 
 module.exports = ArticleLabelService;

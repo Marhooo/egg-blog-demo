@@ -22,12 +22,11 @@ class GameMonitorService extends Service {
           [Op.and]: [{ user_id: this.ctx.session.user.id }, { has_besend: false }],
         },
       });
-      //console.log(result);
-      if (result == null && codeInfo) {
+      if (result.length === 0 && codeInfo) {
         options.verify_code = parseInt(options.imei.slice(-4)) * 2 + 5678;
         await this.ctx.model.GameMonitor.update(options, {
           where: {
-            pay_order: codeInfo.id,
+            pay_order: codeInfo.pay_order,
           },
         });
         this.ctx.body = {
@@ -42,6 +41,31 @@ class GameMonitorService extends Service {
     } catch (err) {
       console.log(err);
       this.ctx.helper.error(200, 10404, '未知错误!请联系作者!');
+    }
+  }
+
+  //远程失落大陆脚本锁
+  async lostVerify(options) {
+    try {
+      const {verify_code} = options
+      const result = await this.ctx.model.GameMonitor.findOne({
+        where: {
+          verify_code: verify_code
+        }
+      })
+      if (result) {
+        this.ctx.body = {
+          code: 200,
+          data: {
+            canload: result.can_load
+          }
+        }
+      } else {
+        this.ctx.helper.error(200, 10204, '查询失败!请联系作者!');        
+      }
+    } catch (err) {
+      console.log(err);
+      this.ctx.helper.error(200, 10404, '未知错误!请联系作者!');      
     }
   }
 }

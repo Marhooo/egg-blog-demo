@@ -58,6 +58,8 @@ module.exports = app => {
   router.post("/articlelabel/addArticleLabel", isLogin, controller.articlelabel.addArticleLabel)
   //查找文章标签
   router.get("/articlelabel/getArticleLabel", isLogin, controller.articlelabel.getArticleLabel)
+  //获取轮播图标签add_num前四
+  router.get("/articlelabel/getBannerLabel", isLogin, controller.articlelabel.getBannerLabel)
 
   /**************************************************************** */
 
@@ -67,6 +69,10 @@ module.exports = app => {
   router.get("/article/articleList", isLogin, controller.article.articleList)
   //获取具体标签文章列表
   router.get("/article/articleInLabel", isLogin, controller.article.articleInLabel)
+  //查询热门文章
+  router.get("/article/articleHot", isLogin, controller.article.articleHot)
+  //搜索你感兴趣的文章
+  router.get("/article/articleInterested", isLogin, controller.article.articleInterested)
   //文章点赞
   router.post("/article/adcArticleLike", isLogin, controller.article.adcArticleLike)
   //获取点赞相关用户信息
@@ -107,4 +113,6 @@ module.exports = app => {
   router.get("/flie/downloadFile", controller.gamemonitor.downloadGameFile)
   //添加IMEI返回激活码
   router.post("/gamemonitoe/addGameRawData", isLogin, controller.gamemonitor.addGameRawData)
+  //远程失落大陆脚本锁
+  router.get("/gamemonitoe/lostVerify", controller.gamemonitor.lostVerify)
 };
