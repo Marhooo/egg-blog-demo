@@ -3,9 +3,9 @@ const Service = require('egg').Service;
 class CommentService extends Service {
   //发表评论
   async addComment(options) {
-    const transaction = await this.ctx.model.transaction()
+    const transaction = await this.ctx.model.transaction();
     try {
-      await this.ctx.model.Comment.create(options, {transaction});
+      await this.ctx.model.Comment.create(options, { transaction });
       const articleResult = await this.ctx.model.Article.findByPk(options.article_id);
       if (articleResult) {
         articleResult.comment_num += 1;
@@ -17,8 +17,8 @@ class CommentService extends Service {
             where: {
               id: options.article_id,
             },
-            transaction
-          },
+            transaction,
+          }
         );
         await transaction.commit();
         this.ctx.body = {
@@ -29,7 +29,7 @@ class CommentService extends Service {
         this.ctx.helper.error(200, 10204, '评论失败');
       }
     } catch (err) {
-      await transaction.rollback()
+      await transaction.rollback();
       console.log(err);
       this.ctx.helper.error(200, 10404, '评论失败');
     }
@@ -37,9 +37,9 @@ class CommentService extends Service {
 
   //回复评论
   async replyComment(options) {
-    const transaction = await this.ctx.model.transaction()
+    const transaction = await this.ctx.model.transaction();
     try {
-      await this.ctx.model.Reply.create(options, {transaction});
+      await this.ctx.model.Reply.create(options, { transaction });
       const commentResult = await this.ctx.model.Comment.findByPk(options.comment_id);
       if (commentResult) {
         const articleResult = await this.ctx.model.Article.findByPk(commentResult.article_id);
@@ -53,10 +53,10 @@ class CommentService extends Service {
               where: {
                 id: articleResult.id,
               },
-              transaction
+              transaction,
             }
           );
-          await transaction.commit()
+          await transaction.commit();
           this.ctx.body = {
             code: 200,
             message: '回复评论成功',
@@ -68,7 +68,7 @@ class CommentService extends Service {
         this.ctx.helper.error(200, 10204, '回复评论失败');
       }
     } catch (err) {
-      await transaction.rollback()
+      await transaction.rollback();
       console.log(err);
       this.ctx.helper.error(200, 10404, '回复评论失败');
     }
@@ -76,52 +76,42 @@ class CommentService extends Service {
 
   //评论列表
   async commentList(getListData) {
-    const { currentPage, pageSize } = getListData;
-    let results = {
-      rows: [],
-    };
     try {
-      let res = await this.ctx.model.Comment.findAndCountAll({
+      const { currentPage, pageSize } = getListData;
+      const result = await this.ctx.model.Comment.findAndCountAll({
         limit: parseInt(pageSize),
         offset: parseInt(pageSize) * (parseInt(currentPage) - 1),
+        order: [['created_at', 'DESC']], //按时间顺序返回，DESC按最新
       });
-      for (let i = 0; i < res.rows.length; i++) {
-        const comment = res.rows[i];
-        //console.log(comment.toJSON());
-        //console.log({haha: comment})
-        const user = await this.ctx.model.SystemUser.findByPk(comment.author_id);
-        const article = await this.ctx.model.Article.findByPk(comment.article_id);
-        //console.log(user)
-        results.rows.push({
-          ...comment.toJSON(),
-          author_name: user.name,
-          article_title: article.title,
-        });
+      for (let i = 0; i < result.rows.length; i++) {
+        const user = await this.ctx.model.SystemUser.findByPk(result.rows[i].author_id);
+        const article = await this.ctx.model.Article.findByPk(result.rows[i].article_id);
+        result.rows[i].dataValues.author_name = user.name;
+        result.rows[i].dataValues.article_title = article.title;
       }
-
-      // let user = [];
-      // let article = [];
-      // for(let i=0; i < res.rows.length; i++){
-      //   const comment = res.rows[i];
-      //   user.push(await this.ctx.model.SystemUser.findByPk(comment.author_id));
-      //   article.push(await this.ctx.model.Article.findByPk(comment.article_id));
-      // }
-      // results = res.rows.map((x, i)=>{
-      //   return{
-      //     ...x.toJSON(),
-      //     author_name : user[i].name,
-      //     article_title : article[i].title
-      //   }
-      // })
-      return results;
+      this.ctx.body = {
+        code: 200,
+        data: result,
+      };
     } catch (err) {
       console.log(err);
-      results = {
-        code: 10000,
-        message: err.message,
-      };
-      return results;
+      this.ctx.helper.error(200, 10404, '查询失败');
     }
+    // map案例
+    // let user = [];
+    // let article = [];
+    // for(let i=0; i < res.rows.length; i++){
+    //   const comment = res.rows[i];
+    //   user.push(await this.ctx.model.SystemUser.findByPk(comment.author_id));
+    //   article.push(await this.ctx.model.Article.findByPk(comment.article_id));
+    // }
+    // results = res.rows.map((x, i)=>{
+    //   return{
+    //     ...x.toJSON(),
+    //     author_name : user[i].name,
+    //     article_title : article[i].title
+    //   }
+    // })
   }
 
   //某篇文章的评论列表(文章第一层评论附带3条reply)
@@ -139,7 +129,7 @@ class CommentService extends Service {
       for (let i = 0; i < result.rows.length; i++) {
         const resUser = await this.ctx.model.SystemUser.findByPk(result.rows[i].commenter_id);
         result.rows[i].dataValues.commenter = resUser.name;
-        result.rows[i].dataValues.commenter_avatar = resUser.avatar
+        result.rows[i].dataValues.commenter_avatar = resUser.avatar;
         const resReply = await this.ctx.model.Reply.findAndCountAll({
           limit: parseInt(child_pageSize),
           offset: parseInt(child_pageSize) * (parseInt(child_currentPage) - 1),
@@ -151,7 +141,9 @@ class CommentService extends Service {
         });
         if (resReply) {
           for (let j = 0; j < resReply.rows.length; j++) {
-            const resFromUser = await this.ctx.model.SystemUser.findByPk(resReply.rows[j].from_user_id);
+            const resFromUser = await this.ctx.model.SystemUser.findByPk(
+              resReply.rows[j].from_user_id
+            );
             const resToUser = await this.ctx.model.SystemUser.findByPk(resReply.rows[j].to_user_id);
             const resToReplyUser = await this.ctx.model.SystemUser.findByPk(
               resReply.rows[j].to_reply_user_id
@@ -213,39 +205,25 @@ class CommentService extends Service {
   }
 
   //删除评论
-  async delComment(cId) {
-    let results;
+  async delComment(options) {
     try {
-      this.ctx.validate({
-        id: 'string',
-      });
-      const res = await this.ctx.model.Comment.destroy({
+      const result = await this.ctx.model.Comment.destroy({
         where: {
-          id: cId,
+          id: options.id,
         },
       });
-      if (res > 0) {
-        results = {
+      if (result > 0) {
+        this.ctx.body = {
           code: 200,
           message: '删除成功!',
         };
       } else {
-        results = {
-          code: 10000,
-          message: '删除失败!',
-        };
+        this.ctx.helper.error(200, 10204, '删除失败!');
       }
-      return results;
     } catch (err) {
       console.log(err);
-      results = {
-        code: 10000,
-        message: err.message,
-      };
-      return results;
+      this.ctx.helper.error(200, 10404, '删除失败!');
     }
   }
-
-  //点赞 可以分文章点赞和评论点赞
 }
 module.exports = CommentService;

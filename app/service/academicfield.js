@@ -38,7 +38,10 @@ class AcademicFieldService extends Service {
         result = await this.ctx.model.AcademicField.findAll();
       }
       if (result) {
-        this.ctx.body = result;
+        this.ctx.body = {
+          code: 200,
+          data: result
+        };
       } else {
         this.ctx.helper.error(200, 10204, '未查询到相关数据');
       }

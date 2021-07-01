@@ -70,9 +70,7 @@ module.exports = {
   error(status, code, message) {
     this.ctx.body = {
       code: code,
-      data: {
-        message,
-      },
+      message: message
     };
     this.ctx.status = status;
   },
@@ -118,18 +116,23 @@ module.exports = {
         // 能查到对应的 refresh_token
         if (!verify(tokenInfo.refresh_token).verify) {
           // 2小时的 token 验证失败了并且7天的 token 验证也失败了
-          await this.error(401, 10000, 'token身份认证失效,请重新登录');
+          this.error(401, 10000, 'token身份认证失效,请重新登录');
         } else {
           // 2小时的 token 验证失败了,但是能查到对应的 refresh_token 并且在有效期内就重新生成新的 token
           const refresh_token = await this.createToken({ id: tokenInfo.uid }, '7', 'days');
           const access_token = await this.createToken({ id: tokenInfo.uid }, '2', 'hours');
           const { id, uid } = { id: tokenInfo.id, uid: tokenInfo.uid };
           await this.ctx.service.admin.login.saveToken({ id, uid, access_token, refresh_token });
-          await this.error(200, 11000, access_token);
+          this.ctx.body = {
+            code: 11000,
+            data: {
+              access_token: access_token
+            }
+          }
         }
       } else {
         // 2小时的 token 验证失败了并且查不到对应的 refresh_token
-        await this.error(401, 10000, 'token身份认证失效,请重新登录');
+        this.error(401, 10000, 'token身份认证失效,请重新登录');
       }
     } else {
       if (tokenInfo) {

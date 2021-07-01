@@ -12,6 +12,10 @@ module.exports = app => {
       defaultValue: false,
     }, // 是否置顶
     content_html: TEXT("long"), // html格式内容
+    content_type: {
+      type: STRING,
+      defaultValue: 'richText'
+    },  //文章主体内容格式。默认为富文本、Markdown
     author: {
       type: STRING,
       allowNull: false,

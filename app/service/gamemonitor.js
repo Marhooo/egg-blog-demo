@@ -61,7 +61,7 @@ class GameMonitorService extends Service {
           }
         }
       } else {
-        this.ctx.helper.error(200, 10204, '查询失败!请联系作者!');        
+        this.ctx.helper.error(200, 10204, '请输入正确的激活码!');        
       }
     } catch (err) {
       console.log(err);

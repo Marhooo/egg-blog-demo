@@ -41,9 +41,7 @@ class CommentController extends Controller {
   // 评论总列表
   async commentList () {
     const getListData = this.ctx.request.query
-    const list = await this.ctx.service.comment.commentList(getListData)
-
-    this.ctx.body = list
+    await this.ctx.service.comment.commentList(getListData)
   }
 
   // 查询出某篇文章的评论列表
@@ -60,9 +58,8 @@ class CommentController extends Controller {
 
   // 删除评论
   async delComment () {
-    const id = this.ctx.request.body.id
-    const result = await this.ctx.service.comment.delComment(id)
-    this.ctx.body = result
+    const options = this.ctx.request.body
+    await this.ctx.service.comment.delComment(options)
   }
 
 
