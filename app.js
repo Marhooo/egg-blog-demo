@@ -48,9 +48,17 @@ class AppBootHook {
             name: "超级管理员",
             describe: "系统最高权限",
             status: true,
-          }).then(ok => {
+          }).then(async ok => {
             rid = ok.id
-            console.log(chalk.green("系统默认最高权限角色生成成功:角色名 [") + chalk.blue("超级管理员") + chalk.green("]"))
+            console.log(chalk.green("系统默认最高权限角色生成成功:角色名 [") + chalk.blue("超级管理员") + chalk.green("]"))            
+            await res.SystemRolePermission.create({
+              role_id: ok.id
+            }).then(okk => {
+              console.log(chalk.green("========== 系统默认最高权限角色Permission创建成功! =========="))
+            }).catch(err => {
+              console.log(chalk.red("========== 系统默认最高权限角色Permission检查失败 =========="))
+              console.log(chalk.red(err))              
+            })
           }).catch(err => {
             console.log(chalk.red("========== 系统最高权限角色检查失败 =========="))
             console.log(chalk.red(err))

@@ -4,8 +4,6 @@ const Controller = require('../core/base_controller');
 class ArticleController extends Controller {
   // 发表文章
   async addArticle() {
-    const articleData = this.ctx.request.body;
-    articleData.author = this.ctx.session.user.id;
     try {
       const Rule = {
         title: {
@@ -18,12 +16,12 @@ class ArticleController extends Controller {
         }
       }
       this.ctx.validate(Rule)
-      console.log(articleData)
+      const options = this.ctx.request.body
+      options.author = this.ctx.session.user.id;
+      await this.ctx.service.article.saveOrUpArticle(options);
     } catch(err) {
-      console.log(err)
       this.ctx.helper.error(200, 10030, '参数错误!')
     }
-    await this.ctx.service.article.saveOrUpArticle(articleData);
   }
 
   // 查询文章列表

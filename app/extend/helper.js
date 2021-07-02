@@ -93,7 +93,7 @@ module.exports = {
     const that = this;
     let backResult = false;
     const token = this.getAccessToken();
-    const verify = await function (token) {
+    const verify = function (token) {
       const result = {};
       that.app.jwt.verify(token, that.app.config.jwt.secret, function (err, decoded) {
         if (err) {

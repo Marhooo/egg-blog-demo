@@ -3,218 +3,185 @@ const Service = require("egg").Service;
 class RoleService extends Service {
   //获取角色列表
   async getRoleList() {
-    const { ctx } = this;
-    let result;
-    await ctx.model.SystemRole.findAndCountAll()
-      .then(async (res) => {
-        result = res;
-        for (let i = 0; i < result.rows.length; i++) {
-          if (result.rows[i].name === "超级管理员") {
-            result.rows[i].dataValues.disabled = true;
-          }
+    try{
+      const result = await this.ctx.model.SystemRole.findAndCountAll()
+      for (let i = 0; i < result.rows.length; i++) {
+        if(result.rows[i].name === "超级管理员") {
+          result.rows[i].dataValues.disabled = true;
         }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    return result;
+      }
+      this.ctx.body = {
+        code: 200,
+        data: result
+      }
+    } catch(err) {
+      console.log(err)
+      this.ctx.helper.error(200, 10404, '未知错误!')       
+    }
   }
 
 
   // 增加修改角色
   async addRole(options) {
-    const { ctx } = this;
-    const { id = null, name, describe, status } = options;
-    let results = {};
-
-    if (id) {
-      await ctx.model.SystemRole.findByPk(id).then(async (res) => {
-        if (res.name === "超级管理员") {
-          results = {
-            code: 10000,
-            message: "系统最高权限不可以修改",
-          };
+    try {
+      console.log(options)
+      const { id = null, name, describe, status } = options;
+      if(id) {
+        const roleInfo = await this.ctx.model.SystemRole.findByPk(id)
+        if(roleInfo.name === '超级管理员') {
+          this.ctx.helper.error(200, 10020, '系统最高权限不可以修改!');
         } else {
-          await ctx.model.SystemRole.update(
-            {
-              name,
-              describe,
-              status,
-            },
-            {
-              where: {
-                id,
-              },
+          const result = await this.ctx.model.SystemRole.update({
+            name,
+            describe,
+            status,            
+          },{
+            where: {
+              id
             }
-          ).then((res) => {
-              if (res > 0) {
-                results = {
-                  code: 200,
-                  message: "角色修改成功",
-                };
-              }
-          }).catch((err) => {
-              results = {
-                code: 10000,
-                message: err,
-              };
-            });
+          })
+          if(result > 0) {
+            this.ctx.body = {
+              code: 200,
+              message: "角色修改成功!"
+            }
+          }
         }
-      });
-    } else {
-      await ctx.model.SystemRole.findOne({
-        where: {
-          name, // 查询条件
-        },
-      }).then(async (result) => {
-        if (!result) {
-          await ctx.model.SystemRole.create(options)
-            .then(async (res) => {
-              await ctx.model.SystemRolePermission.create({
-                role_id: res.id,
-              })
-                .then(() => {
-                  results = {
-                    code: 200,
-                    message: "角色添加成功",
-                  };
-                })
-                .catch((err) => {
-                  results = {
-                    code: 10000,
-                    message: err,
-                  };
-                });
-            })
-            .catch((err) => {
-              results = {
-                code: 10000,
-                message: err,
-              };
-            });
+      } else {
+        const roleInfo = await this.ctx.model.SystemRole.findOne({
+          where: {
+            name
+          }
+        })
+        if(!roleInfo) {
+          const transaction = await this.ctx.model.transaction();
+          const roleBd = await this.ctx.model.SystemRole.create({
+            name,
+            describe,
+            status,            
+          }, {transaction})
+          const permissionBd = await this.ctx.model.SystemRolePermission.create({
+            role_id: roleBd.id
+          }, {transaction})
+          if(roleBd && permissionBd) {
+            await transaction.commit()
+            this.ctx.body = {
+              code: 200,
+              message: "角色添加成功!",
+            };            
+          } else {
+            await transaction.rollback()
+            this.ctx.helper.error(200, 10204, '角色添加失败!');
+          }
         } else {
-          results = {
-            code: 10000,
-            message: "该角色已存在",
-          };
+          this.ctx.helper.error(200, 10204, '角色已存在!');
         }
-      });
+      }
+    } catch (err) {
+      console.log(err)
+      this.ctx.helper.error(200, 10404, '未知错误!')      
     }
-    return results;
   }
 
 
   // 删除角色
-  async delRole (rid) {
-    let results = {}
-    const { ctx } = this
-    await ctx.model.SystemRole.findByPk(rid).then(async res => {
-      if (res.name === "超级管理员") {
-        results = {
-          code: 10000,
-          message: "系统最高权限不可以删除",
-        }
+  async delRole (options) {
+    try {
+      const roleInfo = await this.ctx.model.SystemRole.findByPk(options.id)
+      if(roleInfo.name === '超级管理员') {
+        this.ctx.helper.error(200, 10020, '系统最高权限不可以删除!');
       } else {
-        await ctx.model.SystemRole.destroy({
+        const transaction = await this.ctx.model.transaction();
+        const roleDy = await this.ctx.model.SystemRole.destroy({
           where: {
-            id: rid,
+            id: options.id
           },
-        }).then(async res => {
-          if (res > 0) {
-            await ctx.model.SystemRolePermission.destroy({
-              where: {
-                role_id: rid,
-              }
-            }).then(() => {
-              if (res > 0) {
-                results = {
-                  code: 200,
-                  message: "删除成功",
-                }
-              }
-            })
-          } else {
-            results = {
-              code: 10000,
-              message: "删除失败",
-            }
-          }
-        }).catch(error => {
-          console.log(error)
-          results = {
-            code: 10000,
-            message: error,
-          }
+          transaction
         })
+        const permissionDy = await this.ctx.model.SystemRolePermission.destroy({
+          where: {
+            role_id: options.id
+          },
+          transaction
+        })
+        if(roleDy > 0 && permissionDy > 0) {
+          await transaction.commit()
+          this.ctx.body = {
+            code: 200,
+            message: "角色删除成功!",
+          }
+        } else {
+          await transaction.rollback()
+          this.ctx.helper.error(200, 10204, '角色删除失败!');
+        }
       }
-    })
-    return results
+    } catch(err) {
+      console.log(err)
+      this.ctx.helper.error(200, 10404, '未知错误!')      
+    }
   }
 
 
   // 分配角色权限
   async rolePermissions (options) {
-    const { ctx } = this
-    const { rid, selectPermission } = options
-    const permissionPage = []
-    const permissionButton = []
-    for (let i = 0; i < selectPermission.length; i++) {
-      if (selectPermission[i].toString().includes("btn")) {
-        permissionButton.push(selectPermission[i])
-      } else {
-        permissionPage.push(selectPermission[i])
+    try {
+      const { rid, selectPermission } = options
+      let permissionPage = []
+      let permissionButton = []
+      for (let i = 0; i < selectPermission.length; i++) {
+        if (selectPermission[i].toString().includes("btn")) {
+          permissionButton.push(selectPermission[i])
+        } else {
+          permissionPage.push(selectPermission[i])
+        }
       }
-    }
-    let results = ""
-    await ctx.model.SystemRolePermission.update({
-      permission_page: permissionPage.join(","),
-      permission_button: permissionButton.join(","),
-    }, {
-      where: {
-        role_id: rid,
-      },
-    })
-      .then(async res => {
-        console.log(res)
-        results = {
+      const result = await this.ctx.model.SystemRolePermission.update({
+        permission_page: permissionPage.join(","),
+        permission_button: permissionButton.join(","),        
+      }, {
+        where: {
+          role_id: rid          
+        }
+      })
+      //console.log(result)
+      if(result > 0) {
+        this.ctx.body = {
           code: 200,
-          message: "该角色权限分配成功",
-        }
-      })
-      .catch(err => {
-        results = {
-          code: 10000,
-          message: err,
-        }
-      })
-    return results
+          message: "该角色权限分配成功!",
+        }        
+      } else {
+        this.ctx.helper.error(200, 10204, '该角色权限分配失败!');
+      }   
+    } catch(err) {
+      console.log(err)
+      this.ctx.helper.error(200, 10404, '未知错误!')      
+    }
   }
 
 
   // 获取角色所拥有的权限
-  async searchRolePermissions (rid) {
-    const { ctx } = this
-    let results = {}
-    await ctx.model.SystemRolePermission.findOne({
-      where: {
-        role_id: rid,
-      }
-    })
-      .then(async res => {
-        console.log(res)
-        results = {
-          code: 200,
-          message: "",
-          data: {
-            permissionPage: res.permission_page,
-            permissionButton: res.permission_button,
-          },
+  async searchRolePermissions (options) {
+    try {
+      const result = await this.ctx.model.SystemRolePermission.findOne({
+        where: {
+          role_id: options.rid
         }
       })
-      .catch(err => {
-        console.log(err)
-      })
-    return results
+      if(result) {
+        this.ctx.body = {
+          code: 200,
+          data: {
+            permissionPage: result.permission_page,
+            permissionButton: result.permission_button,
+          }
+        }
+      } else {
+        this.ctx.helper.error(200, 10204, '查询失败!');
+      }
+    } catch(err) {
+      console.log(err)
+      this.ctx.helper.error(200, 10404, '未知错误!')        
+    }
   }
 
 }
