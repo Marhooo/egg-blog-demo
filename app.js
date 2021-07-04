@@ -76,14 +76,14 @@ class AppBootHook {
       }).then(async result => {
         console.log(chalk.green("超级管理员账号检查..."))
         if (!result) {
-          const password = await cryptoMd5("admin", keys)
+          const password = await cryptoMd5("adminmaster", keys)
           await res.SystemUser.create({
             username: "admin",
             password,
             name: "超级管理员",
             role_id: rid,
           }).then(ok => {
-            console.log(chalk.green("系统默认超级管理员账号生成成功:用户名 [") + chalk.blue("admin") + chalk.green("]  密码[") + chalk.blue("admin") + chalk.green("]"))
+            console.log(chalk.green("系统默认超级管理员账号生成成功:用户名 [") + chalk.blue("admin") + chalk.green("]  密码[") + chalk.blue("adminmaster") + chalk.green("]"))
             console.log(chalk.green(`
 ###################################
 ****** 欢迎使用 nodePlatform ******
@@ -119,7 +119,7 @@ class AppBootHook {
 
           })
         } else {
-          console.log(chalk.green("系统检查到已存在默认超级管理员:用户名 [") + chalk.blue("admin") + chalk.green("]  密码[") + chalk.blue("admin") + chalk.green("]"))
+          console.log(chalk.green("系统检查到已存在默认超级管理员:用户名 [") + chalk.blue("admin") + chalk.green("]  密码[") + chalk.blue("adminmaster") + chalk.green("]"))
           console.log(chalk.green(`
 ###################################
 ****** 欢迎使用 nodePlatform ******

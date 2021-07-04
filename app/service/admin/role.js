@@ -125,7 +125,7 @@ class RoleService extends Service {
   // 分配角色权限
   async rolePermissions (options) {
     try {
-      const { rid, selectPermission } = options
+      const { id, selectPermission } = options
       let permissionPage = []
       let permissionButton = []
       for (let i = 0; i < selectPermission.length; i++) {
@@ -140,7 +140,7 @@ class RoleService extends Service {
         permission_button: permissionButton.join(","),        
       }, {
         where: {
-          role_id: rid          
+          role_id: id          
         }
       })
       //console.log(result)
@@ -164,7 +164,7 @@ class RoleService extends Service {
     try {
       const result = await this.ctx.model.SystemRolePermission.findOne({
         where: {
-          role_id: options.rid
+          role_id: options.id
         }
       })
       if(result) {

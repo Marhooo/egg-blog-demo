@@ -1,9 +1,9 @@
 module.exports = () => {
   return async function (ctx, next) {
-    let tagRoleName = null;
-    const myRoleName = ctx.session.user.roleName;
-    const targetUid = ctx.request.body.id;
     try {
+      let tagRoleName = null;
+      const myRoleName = ctx.session.user.roleName;
+      const targetUid = ctx.request.body.id;      
       const resUser = await ctx.model.SystemUser.findByPk(targetUid)
       const resRole = await ctx.model.SystemRole.findByPk(resUser.role_id)
       tagRoleName = resRole ? resRole.name : "";
@@ -14,6 +14,7 @@ module.exports = () => {
       }
     } catch (error) {
       console.log(error)
+      ctx.helper.error(200, 10404, "未知错误!");
     }
   };
 };

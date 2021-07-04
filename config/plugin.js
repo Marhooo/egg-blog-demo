@@ -17,7 +17,7 @@ exports.validate = {
 
 exports.session = {
   key: 'EGG_SESS',
-  maxAge: 24 * 3600 * 1000, // 1 天
+  maxAge: 7 * 24 * 3600 * 1000, // 7 天
   httpOnly: true,
   encrypt: true,
 };
