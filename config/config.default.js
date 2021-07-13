@@ -28,6 +28,11 @@ module.exports = appInfo => {
     enable: false,
   };
 
+  config.validate = {
+    // convert: false,
+    // validateRoot: false,
+  };  
+
   config.cors = {
     origin: ctx => ctx.get('origin'),      //匹配规则  域名+端口  *则为全匹配
     allowMethods: 'GET,HEAD,POST,PATCH',

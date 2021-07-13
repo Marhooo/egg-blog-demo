@@ -1,7 +1,7 @@
 const db = require("../database/db");
 
 module.exports = (app) => {
-  const { STRING, TEXT } = app.Sequelize;
+  const { STRING, TEXT, UUID } = app.Sequelize;
 
   const Reply = db.defineModel(app, "replys", {
     content: { type: TEXT("long"), allowNull: false }, // 评论内容
@@ -10,9 +10,14 @@ module.exports = (app) => {
       allowNull: false,
     }, // 当前评论人id
     comment_id: {
-      type: STRING,
-      allowNull: false,
-    }, // 评论文章id
+      type: UUID,
+      references: {
+        model: 'comments',
+        key: 'id',
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+    }, // 评论id外键
     to_user_id: {
       type: STRING,
       allowNull: false,

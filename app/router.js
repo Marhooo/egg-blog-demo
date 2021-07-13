@@ -7,10 +7,11 @@ module.exports = app => {
   const { router, controller, middleware } = app;
   const isLogin = middleware.verifyToken()
   const roleAndUseStatus = middleware.roleAndUseStatus()
-  const editAdmin = middleware.editAdmin()
-  const editRoleAdmin = middleware.editRoleAdmin()
+  const editAdminRole = middleware.editAdminRole()
   const editGuardRole = middleware.editGuardRole()
   const editArticle = middleware.editArticle()
+  const bySelfOrAdmin = middleware.bySelfOrAdmin()
+  const verifyPhone = middleware.verifyPhone()
 
 
   router.get('/', controller.home.index);
@@ -19,7 +20,7 @@ module.exports = app => {
   //测试接口
   router.get("/testapi", controller.admin.atest.testapi)
   // 注册接口
-  router.post("/admin/user/register", controller.admin.register.userRegister)
+  router.post("/admin/user/register", verifyPhone, controller.admin.register.userRegister)
   //测试用的微信登录接口换取token
   router.post("/customer/user/wxLogin", controller.customer.wxlogin.wxLogin)
   // 微信小程序注册/登录接口(换取token)
@@ -35,19 +36,19 @@ module.exports = app => {
   // 获取用户列表
   router.get("/user/userList", isLogin, roleAndUseStatus, controller.admin.user.userList)
   // 修改用户信息
-  router.post("/user/editUserInfo", isLogin, roleAndUseStatus, editAdmin, controller.admin.user.editUserInfo)
+  router.post("/user/editUserInfo", isLogin, roleAndUseStatus, bySelfOrAdmin, verifyPhone, controller.admin.user.editUserInfo)
   // 修改密码
   router.post("/user/editPassword", isLogin, roleAndUseStatus, controller.admin.user.editPassword)
   // 删除用户
-  router.post("/user/delUser", isLogin, roleAndUseStatus, editAdmin, controller.admin.user.delUser)
+  router.post("/user/delUser", isLogin, roleAndUseStatus, editGuardRole, controller.admin.user.delUser)
   // 角色列表
-  router.get("/permissions/getRoleList", isLogin, roleAndUseStatus, controller.admin.role.getRoleList)
+  router.get("/permissions/getRoleList", controller.admin.role.getRoleList)
   // 增加角色
-  router.post("/permissions/addRole", isLogin, editRoleAdmin, roleAndUseStatus, controller.admin.role.addRole)
+  router.post("/permissions/addRole", isLogin, editAdminRole, roleAndUseStatus, controller.admin.role.addRole)
   // 删除角色
-  router.post("/permissions/delRole", isLogin, editRoleAdmin, roleAndUseStatus, controller.admin.role.delRole)
+  router.post("/permissions/delRole", isLogin, editAdminRole, roleAndUseStatus, controller.admin.role.delRole)
   // 分配角色权限
-  router.post("/permissions/rolePermissions", isLogin, editRoleAdmin, roleAndUseStatus, controller.admin.role.rolePermissions)
+  router.post("/permissions/rolePermissions", isLogin, editAdminRole, roleAndUseStatus, controller.admin.role.rolePermissions)
   // 获取角色所拥有的权限
   router.post("/permissions/searchRolePermissions", isLogin, roleAndUseStatus, controller.admin.role.searchRolePermissions)
   /**************************************************************** */
@@ -73,6 +74,8 @@ module.exports = app => {
   router.get("/article/articleInLabel", isLogin, roleAndUseStatus, controller.article.articleInLabel)
   //查询热门文章
   router.get("/article/articleHot", isLogin, roleAndUseStatus, controller.article.articleHot)
+  //查询你的文章
+  router.get("/article/articleYouself", isLogin, roleAndUseStatus, controller.article.articleYouself)
   //搜索你感兴趣的文章
   router.get("/article/articleInterested", isLogin, roleAndUseStatus, controller.article.articleInterested)
   //文章点赞
@@ -114,7 +117,7 @@ module.exports = app => {
   //游戏文件下载
   router.get("/flie/downloadFile", controller.gamemonitor.downloadGameFile)
   //添加IMEI返回激活码
-  router.post("/gamemonitoe/addGameRawData", isLogin, roleAndUseStatus, controller.gamemonitor.addGameRawData)
+  router.post("/gamemonitor/addGameRawData", isLogin, roleAndUseStatus, controller.gamemonitor.addGameRawData)
   //远程失落大陆脚本锁
-  router.get("/gamemonitoe/lostVerify", controller.gamemonitor.lostVerify)
+  router.get("/gamemonitor/lostVerify", controller.gamemonitor.lostVerify)
 };

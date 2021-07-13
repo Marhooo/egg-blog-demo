@@ -5,10 +5,13 @@ FROM node:14.16.1
 ENV NODE_ENV production
 
 # 这个是容器中的文件目录
-RUN mkdir -p /usr/src/app 
+RUN mkdir -p /usr/src/app
 
 # 设置工作目录
 WORKDIR /usr/src/app
+
+#创建一个具有指定名称的挂载点，定义的是容器内目录所在路径，在容器创建过程中会在容器中创建该目录，而宿主机上的对应的挂载目录名是随机生成的
+VOLUME /usr/src/app/app/public
 
 # 拷贝package.json文件到工作目录
 # !!重要：package.json需要单独添加。
@@ -27,4 +30,7 @@ COPY . /usr/src/app
 # 暴露容器端口
 EXPOSE 7001
 
-CMD npm start
+#CMD npm start
+
+#应对单核服务器只开一个workers的窘境。加一个start.js判断，为单核服务器开2个workers
+CMD npm run scripts:start

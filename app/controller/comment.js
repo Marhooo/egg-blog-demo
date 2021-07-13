@@ -5,14 +5,12 @@ class CommentController extends Controller {
   async addComment() {
     //在controller层抛出字段校验错误。好处是防止service层里重要服务端信息被抛出。
     try{
-      this.ctx.validate({
-        content: 'string',
-      });
+      this.ctx.validate({ content: { type: 'string', max: 60} }, this.ctx.request.body);
       const commentData = this.ctx.request.body;
       commentData.commenter_id = this.ctx.session.user.id;    
       await this.ctx.service.comment.addComment(commentData)
     } catch(err) {
-      err.warn = '参数错误'
+      err.warn = '参数错误!'
       this.ctx.helper.error(200, 10030, err);
     }
   }
@@ -20,20 +18,12 @@ class CommentController extends Controller {
   // 回复评论
   async replyComment () {
     try {
-      const replyRule = {
-        to_user_id: 'string',
-        content: {
-          type: 'string',
-          max: 60,
-        },
-        comment_id: 'string',
-      };
-      this.ctx.validate(replyRule)
+      this.ctx.validate({ content: { type: 'string', max: 60} }, this.ctx.request.body)
       const replyData = this.ctx.request.body
       replyData.from_user_id = this.ctx.session.user.id
       await this.ctx.service.comment.replyComment(replyData)      
     } catch(err) {
-      err.warn = '参数错误'
+      err.warn = '参数错误!'
       this.ctx.helper.error(200, 10030, err);
     }
   }

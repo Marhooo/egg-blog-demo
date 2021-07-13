@@ -47,21 +47,36 @@ class GameMonitorService extends Service {
   //远程失落大陆脚本锁
   async lostVerify(options) {
     try {
-      const {verify_code} = options
+      const {verify_code, time_stamp} = options
       const result = await this.ctx.model.GameMonitor.findOne({
         where: {
           verify_code: verify_code
         }
       })
       if (result) {
+        await this.ctx.model.GameMonitor.update({
+          last_load: time_stamp
+        },
+        {
+          where: {
+            verify_code: verify_code
+          }
+        })
         this.ctx.body = {
           code: 200,
           data: {
-            canload: result.can_load
+            canload: result.can_load,
+            canaction: result.can_action
           }
         }
       } else {
-        this.ctx.helper.error(200, 10204, '请输入正确的激活码!');        
+        this.ctx.body = {
+          code: 200,
+          data: {
+            canload: false,
+            canaction: false
+          }
+        }        
       }
     } catch (err) {
       console.log(err);

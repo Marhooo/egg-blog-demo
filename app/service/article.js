@@ -86,6 +86,7 @@ class articleService extends Service {
             [Op.like]: `%${article_label}%`,
           },
         },
+        order: [['read_num', 'DESC']]
       });
       //这里查出来的已经有所有的列表count数量了
       this.ctx.body = {
@@ -95,6 +96,28 @@ class articleService extends Service {
     } catch (err) {
       console.log(err);
       this.ctx.helper.error(200, 10404, '查询失败');
+    }
+  }
+
+  //查找你的文章
+  async getArticleYouself(options) {
+    try {
+      const { currentPage, pageSize, id } = options;
+      const result = await this.ctx.model.Article.findAndCountAll({
+        limit: parseInt(pageSize),
+        offset: parseInt(pageSize) * (parseInt(currentPage) - 1),
+        where: {
+          author: id
+        },
+        order: [['created_at', 'DESC']]      
+      })
+      this.ctx.body = {
+        code: 200,
+        data: result,
+      };
+    }catch(err) {
+      console.log(err);
+      this.ctx.helper.error(200, 10404, '查询失败');      
     }
   }
 

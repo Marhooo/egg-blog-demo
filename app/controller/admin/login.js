@@ -3,8 +3,22 @@ const Controller = require("../../core/base_controller");
 class LoginController extends Controller {
   //用户登陆
   async userLogin() {
-    const options = this.ctx.request.body;
-    await this.ctx.service.admin.login.userLogin(options)
+    try {
+      const Rule = {
+        loginuser: {
+          type: 'string',
+          min: 6,
+          max: 16
+        },
+        password: { type: 'string', min: 6, max: 16}
+      };      
+      this.ctx.validate(Rule, this.ctx.request.body);
+      const options = this.ctx.request.body;
+      await this.ctx.service.admin.login.userLogin(options)
+    } catch(err) {
+      err.warn = '参数错误!'
+      this.ctx.helper.error(200, 10030, err);      
+    }
   }
 
 

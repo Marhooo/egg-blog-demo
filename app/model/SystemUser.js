@@ -14,7 +14,7 @@ module.exports = app =>{
         company: STRING, // 公司
         department: STRING, // 部门
         telephone: STRING, // 联系电话
-        mobile_phone: { type: STRING }, // 手机号码
+        mobile_phone: { type: STRING, unique: true, allowNull: false }, // 手机号码
         info: STRING, // 备注说明
         role_id: UUID, // 角色id
         status: { type: STRING, defaultValue: "1" }, //  用户状态： 0:禁用, 1:启用, 2:删除(隐藏)

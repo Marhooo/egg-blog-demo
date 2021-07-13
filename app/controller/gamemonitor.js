@@ -3,8 +3,14 @@ const Controller = require('../core/base_controller');
 class GameMonitorController extends Controller {
   //
   async addGameRawData() {
-    const options = this.ctx.request.body;
-    await this.ctx.service.gamemonitor.addGameRawData(options);
+    try {
+      this.ctx.validate({ imei: { type: 'string', min: 6, max: 35, format: /^\w+[\d][\d][\d][\d]$/, allowEmpty: false} }, this.ctx.request.body);
+      const options = this.ctx.request.body;
+      await this.ctx.service.gamemonitor.addGameRawData(options);
+    } catch(err) {
+      err.warn = '参数错误!'
+      this.ctx.helper.error(200, 10030, err);  
+    }
   }
 
   //文件下载

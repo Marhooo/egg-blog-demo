@@ -11,6 +11,8 @@ module.exports = (app) => {
     has_besend: { type: BOOLEAN, defaultValue: false }, //是否已经发给客户  
     online: { type: BOOLEAN, defaultValue: false }, //是否在线
     can_load: { type: BOOLEAN, defaultValue: true }, //是否可用此激活码
+    can_action: { type: BOOLEAN, defaultValue: false }, //是否可用此激活码
+    last_load: INTEGER, //最后登录时间
     wechat_name: STRING, //购买人微信名
     pay_order: {
       //隶属支付订单id

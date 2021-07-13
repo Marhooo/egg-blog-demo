@@ -7,7 +7,15 @@ module.exports = (app) => {
     label_name: { type: STRING, allowNull: false },
     add_num: { type: INTEGER, defaultValue: 0 },
     label_src: STRING,
-    field_id: { type: UUID, allowNull: false },
+    field_id: {
+      type: UUID,
+      references: {
+        model: 'academicfield',
+        key: 'id',
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',      
+    },
   });
 
   return ArticleLabel;

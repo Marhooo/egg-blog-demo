@@ -2,15 +2,19 @@ const Service = require("egg/index").Service
 
 class LoginService extends Service{
   async userLogin(options) {
+    const Op = this.app.Sequelize.Op;
     try{
-      const { username, password } = options;
+      const { loginuser, password } = options;
       const user = await this.ctx.model.SystemUser.findOne({
         where: {
-          username: username
+          [Op.or]: [
+            {username: loginuser},
+            {mobile_phone: loginuser}
+          ]
         }
       })
       if (!user || user.status === "2") {
-        this.ctx.helper.error(200, 10204, '用户名不存在!');
+        this.ctx.helper.error(200, 10204, '账号不存在!');
       } else {
         const verifyPass = await this.ctx.helper.cryptoMd5(password, this.config.keys);
         const roleResult = await this.ctx.model.SystemRole.findByPk(user.role_id)

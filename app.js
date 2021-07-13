@@ -1,9 +1,16 @@
 const chalk = require("chalk")
 const { cryptoMd5 } = require("./app/extend/helper")
+const path = require('path')
 class AppBootHook {
   constructor (app) {
     this.app = app
   }
+
+  async didLoad() {
+    // 引入validate目录，并注入app实例
+    const directory = path.join(this.app.config.baseDir, 'app/validate');
+    this.app.loader.loadToApp(directory, 'validate');
+  }   
 
   async willReady () {
     const keys = this.app.config.keys
@@ -71,19 +78,20 @@ class AppBootHook {
 
       await res.SystemUser.findOne({
         where: {
-          username: "admin", // 查询条件
+          username: "adminmaster", // 查询条件
         },
       }).then(async result => {
         console.log(chalk.green("超级管理员账号检查..."))
         if (!result) {
           const password = await cryptoMd5("adminmaster", keys)
           await res.SystemUser.create({
-            username: "admin",
+            username: "adminmaster",
+            mobile_phone: "12345678901",
             password,
             name: "超级管理员",
             role_id: rid,
           }).then(ok => {
-            console.log(chalk.green("系统默认超级管理员账号生成成功:用户名 [") + chalk.blue("admin") + chalk.green("]  密码[") + chalk.blue("adminmaster") + chalk.green("]"))
+            console.log(chalk.green("系统默认超级管理员账号生成成功:用户名 [") + chalk.blue("adminmaster") + chalk.green("]  密码[") + chalk.blue("adminmaster") + chalk.green("]"))
             console.log(chalk.green(`
 ###################################
 ****** 欢迎使用 nodePlatform ******
@@ -119,7 +127,7 @@ class AppBootHook {
 
           })
         } else {
-          console.log(chalk.green("系统检查到已存在默认超级管理员:用户名 [") + chalk.blue("admin") + chalk.green("]  密码[") + chalk.blue("adminmaster") + chalk.green("]"))
+          console.log(chalk.green("系统检查到已存在默认超级管理员:用户名 [") + chalk.blue("adminmaster") + chalk.green("]"))
           console.log(chalk.green(`
 ###################################
 ****** 欢迎使用 nodePlatform ******

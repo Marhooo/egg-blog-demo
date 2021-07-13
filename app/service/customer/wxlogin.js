@@ -4,6 +4,7 @@ class WxLoginService extends Service {
   //微信小程序发来请求有两种情况：1.重新授权用户信息和手机信息后发来的请求。 2.一般微信小程序请求后台登录拿token
   async wxRegisterLogin(options) {
     try {
+      const Op = this.app.Sequelize.Op;
       const transaction = await this.ctx.model.transaction();
       const { js_code } = options;
       const url =
@@ -24,15 +25,20 @@ class WxLoginService extends Service {
           let userInfo = this.ctx.helper.wxUserDecryptData(resOidAndSkey.data.session_key, options.userEncryptedData, options.userIv)
           let userPhoneInfo = this.ctx.helper.wxUserDecryptData(resOidAndSkey.data.session_key, options.phoneEncryptedData, options.phoneIv)
           const roleInfo = await this.ctx.model.SystemRole.findOne({
-            where: { name: '游客' },
+            where: { name: '游戏玩家' },
           });
           const user = await this.ctx.model.SystemUser.findOne({
-            where: { openid: resOidAndSkey.data.openid }
+            where: {
+              [Op.or]: [
+                { openid: resOidAndSkey.data.openid },
+                { mobile_phone: userPhoneInfo.phoneNumber }
+              ]
+            }
           });
           if (!user) {
             await this.ctx.model.SystemUser.create({
-              username: 'wxlogin',
-              password: 'wxlogin',
+              username: `wechat${userPhoneInfo.phoneNumber}`,
+              password: userPhoneInfo.phoneNumber,
               openid: resOidAndSkey.data.openid,
               unionid: resOidAndSkey.data.unionid,
               role_id: roleInfo.id,
@@ -70,16 +76,19 @@ class WxLoginService extends Service {
               };
             } else {
               await transaction.rollback();
-              this.ctx.helper.error(200, 10204, 'token获取失败');
+              this.ctx.helper.error(200, 10204, '首次小程序登录创建用户失败!');
             }
           } else {
             await this.ctx.model.SystemUser.update(
               {
                 name: userInfo.nickName,
+                openid: resOidAndSkey.data.openid,
+                unionid: resOidAndSkey.data.unionid,
+                role_id: roleInfo.id,
+                session_key: resOidAndSkey.data.session_key,
                 info: `${userInfo.province},${userInfo.city}`,
                 avatar: userInfo.avatarUrl,
-                sex: userInfo.gender == 1 ? '1' : '2',
-                mobile_phone: userPhoneInfo.phoneNumber
+                sex: userInfo.gender == 1 ? '1' : '2'
               },
               {
                 where: {
@@ -90,8 +99,10 @@ class WxLoginService extends Service {
             );
             const role = await this.ctx.model.SystemRole.findByPk(user.role_id);
             if (!role.status) {
+              await transaction.rollback();
               this.ctx.helper.error(200, 10020, '该账号所在角色已被禁用,请联系管理员');
             } else if (!user.status || user.status == '0') {
+              await transaction.rollback();
               this.ctx.helper.error(200, 10020, '该账号已被禁用,请联系管理员');
             } else {
               const refresh_token = await this.ctx.helper.createToken({ id: user.id }, '7', 'days');
