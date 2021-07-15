@@ -168,8 +168,9 @@ module.exports = {
     try {
       // 写入文件
       await awaitStreamReady(stream.pipe(writeStream));
-      imgUrl =
-        'http://' + this.ctx.request.header.host + '/public/upload/' + dirName + '/' + filename;
+      // imgUrl =
+      //   'http://' + this.ctx.request.header.host + '/public/upload/' + dirName + '/' + filename;
+      imgUrl = 'https://mboke.top/api/public/upload/' + dirName + '/' + filename;
     } catch (err) {
       // 必须将上传的文件流消费掉，要不然浏览器响应会卡死
       await sendToWormhole(stream);

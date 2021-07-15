@@ -36,7 +36,7 @@ module.exports = app => {
   // 获取用户列表
   router.get("/user/userList", isLogin, roleAndUseStatus, controller.admin.user.userList)
   // 修改用户信息
-  router.post("/user/editUserInfo", isLogin, roleAndUseStatus, bySelfOrAdmin, verifyPhone, controller.admin.user.editUserInfo)
+  router.post("/user/editUserInfo", isLogin, roleAndUseStatus, bySelfOrAdmin, controller.admin.user.editUserInfo)
   // 修改密码
   router.post("/user/editPassword", isLogin, roleAndUseStatus, controller.admin.user.editPassword)
   // 删除用户

@@ -36,9 +36,9 @@ class WxLoginService extends Service {
             }
           });
           if (!user) {
-            await this.ctx.model.SystemUser.create({
+            const createUser = await this.ctx.model.SystemUser.create({
               username: `wechat${userPhoneInfo.phoneNumber}`,
-              password: userPhoneInfo.phoneNumber,
+              password: await this.ctx.helper.cryptoMd5(userPhoneInfo.phoneNumber, this.config.keys),
               openid: resOidAndSkey.data.openid,
               unionid: resOidAndSkey.data.unionid,
               role_id: roleInfo.id,
@@ -49,21 +49,18 @@ class WxLoginService extends Service {
               sex: userInfo.gender == 1 ? '1' : '2',
               mobile_phone: userPhoneInfo.phoneNumber
             }, {transaction});
-            const checkUser = await this.ctx.model.SystemUser.findOne({
-              where: { openid: resOidAndSkey.data.openid }
-            });
-            if (checkUser) {
+            if (createUser) {
               const refresh_token = await this.ctx.helper.createToken(
-                { id: checkUser.id },
+                { id: createUser.id },
                 '7',
                 'days'
               );
               const access_token = await this.ctx.helper.createToken(
-                { id: checkUser.id },
+                { id: createUser.id },
                 '2',
                 'hours'
               );
-              const uid = checkUser.id;
+              const uid = createUser.id;
               await this.ctx.model.SystemToken.upsert({
                 uid,
                 access_token,

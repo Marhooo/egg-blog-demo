@@ -20,8 +20,8 @@ class GameMonitorController extends Controller {
       const nowtime = Math.round(new Date().getTime() / 1000);
       if (nowtime < options.querytime) {
         await this.ctx.helper.download(
-          'app/public/download/失落大陆辅助V5.apk',
-          '失落大陆辅助V5.apk'
+          'app/public/download/失落大陆辅助.apk',
+          '失落大陆辅助.apk'
         );
       } else {
         this.ctx.helper.error(200, 10030, '请求链接失效，请返回小程序重新获取下载链接!');

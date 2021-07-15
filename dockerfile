@@ -30,7 +30,7 @@ COPY . /usr/src/app
 # 暴露容器端口
 EXPOSE 7001
 
-#CMD npm start
+CMD npm start
 
-#应对单核服务器只开一个workers的窘境。加一个start.js判断，为单核服务器开2个workers
-CMD npm run scripts:start
+#应对单核服务器只开一个workers的窘境。加一个start.js判断，为单核服务器开2个workers。但是感觉还是有错误，表创建的时候会尝试常见两个超级管理员
+#CMD npm run scripts:start
